@@ -14,13 +14,26 @@ import { formatARS } from './utils/format';
 const ESTADOS = ['Presupuestado', 'Realizado'];
 
 const selectStyle = {
-  background: 'var(--bg-surface)',
-  border: '1px solid rgba(0,212,255,0.2)',
+  background: 'linear-gradient(135deg, rgba(255,106,185,0.12), rgba(9,9,16,0.95))',
+  border: '1px solid rgba(255,106,185,0.35)',
   borderRadius: '8px',
   padding: '7px 28px 7px 12px',
-  color: 'var(--text-primary)',
-  fontSize: '12px',
-  fontFamily: 'var(--mono)',
+  color: '#FF6AB9',
+  fontSize: '13px',
+  fontFamily: 'var(--sans)',
+  fontWeight: 600,
+  outline: 'none',
+  cursor: 'pointer',
+};
+
+const filterSelectStyle = {
+  background: 'rgba(255,106,185,0.05)',
+  border: '1px solid rgba(255,106,185,0.15)',
+  borderRadius: '8px',
+  padding: '7px 28px 7px 12px',
+  color: 'var(--text-secondary)',
+  fontSize: '13px',
+  fontFamily: 'var(--sans)',
   outline: 'none',
   cursor: 'pointer',
 };
@@ -47,19 +60,20 @@ export default function App() {
 
       {/* Header */}
       <header style={{
-        background: 'var(--bg-base)',
-        borderBottom: '1px solid rgba(0,212,255,0.2)',
+        background: 'linear-gradient(135deg, rgba(255,106,185,0.1) 0%, rgba(9,9,16,0.97) 60%)',
+        borderBottom: '1px solid rgba(255,106,185,0.2)',
         padding: '14px 32px',
         position: 'sticky',
         top: 0,
         zIndex: 10,
+        backdropFilter: 'blur(12px)',
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--mono)', fontSize: '16px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+            <h1 style={{ fontFamily: 'var(--display)', fontSize: '19px', color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {user ? `Hola, ${user.nombre.split(' ')[0]}` : 'INNOVACIÓN & CREATIVIDAD'}
             </h1>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginTop: '2px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 300, marginTop: '2px' }}>
               {user ? `Estás viendo la vista de ${estado}` : 'DASHBOARD EJECUTIVO'}
             </p>
           </div>
@@ -67,7 +81,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Estado global selector */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Vista
               </span>
               <select
@@ -75,7 +89,7 @@ export default function App() {
                 onChange={e => setEstado(e.target.value)}
                 style={selectStyle}
                 onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-                onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+                onBlur={e => (e.target.style.borderColor = 'rgba(255,106,185,0.35)')}
               >
                 {ESTADOS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
@@ -86,9 +100,9 @@ export default function App() {
             {user?.rol === 'DEV' && (
               <Link
                 to="/users"
-                style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textDecoration: 'none', padding: '7px 12px', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '8px' }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.4)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)'; }}
+                style={{ fontSize: '13px', color: '#FF6AB9', fontFamily: 'var(--sans)', fontWeight: 600, textDecoration: 'none', padding: '7px 12px', background: 'rgba(255,106,185,0.08)', border: '1px solid rgba(255,106,185,0.2)', borderRadius: '8px' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,106,185,0.15)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,106,185,0.08)'; }}
               >
                 Usuarios
               </Link>
@@ -96,9 +110,9 @@ export default function App() {
 
             <button
               onClick={logout}
-              style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '8px', padding: '7px 12px', cursor: 'pointer', fontFamily: 'var(--mono)' }}
+              style={{ fontSize: '13px', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(255,106,185,0.3)', borderRadius: '8px', padding: '7px 12px', cursor: 'pointer', fontFamily: 'var(--sans)' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#ff4d6d'; e.currentTarget.style.borderColor = 'rgba(255,77,109,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(255,106,185,0.3)'; }}
             >
               Salir
             </button>
@@ -143,16 +157,16 @@ export default function App() {
 
           {/* Filters bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '4px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '4px' }}>
               Filtros
             </span>
 
-            <select value={filters.año} onChange={e => setFilter('año', e.target.value)} style={selectStyle}>
+            <select value={filters.año} onChange={e => setFilter('año', e.target.value)} style={filterSelectStyle}>
               <option value="">Todos los años</option>
               {años.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
 
-            <select value={filters.sheet} onChange={e => setFilter('sheet', e.target.value)} style={selectStyle}>
+            <select value={filters.sheet} onChange={e => setFilter('sheet', e.target.value)} style={filterSelectStyle}>
               <option value="">Todas las campañas</option>
               {campaigns.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -162,9 +176,9 @@ export default function App() {
               placeholder="Buscar cliente…"
               value={filters.cliente}
               onChange={e => setFilter('cliente', e.target.value)}
-              style={{ ...selectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
+              style={{ ...filterSelectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
               onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,106,185,0.15)')}
             />
 
             <input
@@ -172,15 +186,15 @@ export default function App() {
               placeholder="Buscar elemento…"
               value={filters.elemento}
               onChange={e => setFilter('elemento', e.target.value)}
-              style={{ ...selectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
+              style={{ ...filterSelectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
               onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,106,185,0.15)')}
             />
 
             {(filters.año || filters.sheet || filters.cliente || filters.elemento) && (
               <button
                 onClick={() => setFilters({ año: '', cliente: '', sheet: '', elemento: '' })}
-                style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--mono)', textDecoration: 'underline' }}
+                style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--sans)', textDecoration: 'underline' }}
               >
                 limpiar
               </button>
@@ -192,19 +206,19 @@ export default function App() {
                 onClick={() => setModal({ project: null })}
                 style={{
                   padding: '7px 16px',
-                  fontSize: '12px',
-                  fontFamily: 'var(--mono)',
+                  fontSize: '13px',
+                  fontFamily: 'var(--sans)',
                   fontWeight: '600',
-                  border: '1px solid var(--accent)',
+                  border: 'none',
                   borderRadius: '8px',
-                  background: 'transparent',
-                  color: 'var(--accent)',
+                  background: 'linear-gradient(135deg, #FF6AB9, #e040a0)',
+                  color: '#fff',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   letterSpacing: '0.05em',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#080C10'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)'; }}
+                onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
               >
                 + NUEVO
               </button>
@@ -222,7 +236,7 @@ export default function App() {
       </main>
 
       <footer style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 32px', textAlign: 'center' }}>
-        <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>
+        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, letterSpacing: '0.1em' }}>
           INNOVACIÓN & CREATIVIDAD · DASHBOARD V2
         </p>
       </footer>
