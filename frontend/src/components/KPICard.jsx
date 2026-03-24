@@ -44,7 +44,7 @@ export default function KPICard({ title, value, subtitle, accent = false }) {
       </p>
 
       {subtitle && (
-        <p style={{ color: '#FF6AB9', fontFamily: 'var(--sans)', fontSize: '12px', fontWeight: 300 }}>
+        <p style={{ color: 'var(--accent)', fontFamily: 'var(--sans)', fontSize: '12px', fontWeight: 300 }}>
           {subtitle}
         </p>
       )}
