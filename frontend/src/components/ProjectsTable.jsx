@@ -27,7 +27,6 @@ function TrashIcon() {
 export default function ProjectsTable({ projects, loading, role, onEdit, onRefresh }) {
   const [page, setPage] = useState(1);
 
-  // Reset page when projects change (filter change)
   useEffect(() => { setPage(1); }, [projects]);
 
   const total = projects.length;
@@ -45,14 +44,13 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
   }
 
   const thStyle = {
-    padding: '10px 14px',
-    fontSize: '10px',
+    padding: '13px 16px',
+    fontSize: '11px',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
-    fontFamily: 'var(--mono)',
+    fontFamily: 'var(--sans)',
     color: 'var(--text-muted)',
-    background: 'var(--bg-base)',
-    fontWeight: '500',
+    fontWeight: 600,
     textAlign: 'left',
     whiteSpace: 'nowrap',
   };
@@ -62,10 +60,10 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
       <div
         className="rounded-xl p-10 text-center text-sm"
         style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
+          background: 'linear-gradient(135deg, rgba(255,106,185,0.04) 0%, rgba(9,9,16,0.98) 100%)',
+          border: '1px solid rgba(255,106,185,0.15)',
           color: 'var(--text-muted)',
-          fontFamily: 'var(--mono)',
+          fontFamily: 'var(--sans)',
         }}
       >
         Cargando proyectos…
@@ -76,12 +74,19 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
   return (
     <div
       className="rounded-xl overflow-hidden"
-      style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,106,185,0.04) 0%, rgba(9,9,16,0.98) 100%)',
+        border: '1px solid rgba(255,106,185,0.15)',
+        borderRadius: '12px',
+      }}
     >
       <div className="overflow-x-auto">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr>
+            <tr style={{
+              background: 'linear-gradient(90deg, rgba(255,106,185,0.1), transparent)',
+              borderBottom: '1px solid rgba(255,106,185,0.15)',
+            }}>
               <th style={thStyle}>Cliente</th>
               <th style={thStyle}>Campaña</th>
               <th style={thStyle}>Elemento</th>
@@ -97,14 +102,14 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
             {paginated.map((p, i) => (
               <tr
                 key={p.id || i}
-                style={{ borderTop: '1px solid var(--border-subtle)', transition: 'background 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-dim)')}
+                style={{ borderBottom: '1px solid rgba(255,106,185,0.06)', transition: 'background 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,106,185,0.05)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <td style={{ padding: '10px 14px', fontSize: '12px', color: 'var(--text-primary)', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#d1d5db', fontFamily: 'var(--sans)', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.cliente || '—'}
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: '13px', color: 'var(--accent)', fontFamily: 'var(--mono)', fontWeight: '500' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#FF6AB9', fontFamily: 'var(--sans)', fontWeight: 600 }}>
                   {p.sheet}
                   {p.source === 'local' && (
                     <span style={{ marginLeft: '6px', fontSize: '9px', color: 'var(--positive)', border: '1px solid var(--positive)', borderRadius: '3px', padding: '1px 4px' }}>NEW</span>
@@ -113,67 +118,109 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
                     <span style={{ marginLeft: '6px', fontSize: '9px', color: '#F59E0B', border: '1px solid #F59E0B', borderRadius: '3px', padding: '1px 4px' }}>EDT</span>
                   )}
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: '12px', color: 'var(--text-muted)', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.elemento || '—'}
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right', fontFamily: 'var(--mono)' }}>
+                <td style={{ padding: '12px 16px', fontSize: '15px', color: '#e2e8f0', textAlign: 'right', fontFamily: 'var(--display)' }}>
                   {formatARS(p.totalProd)}
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: '13px', color: 'var(--text-primary)', textAlign: 'right', fontFamily: 'var(--mono)', fontWeight: '600' }}>
+                <td style={{ padding: '12px 16px', fontSize: '15px', color: '#e2e8f0', textAlign: 'right', fontFamily: 'var(--display)' }}>
                   {formatARS(p.tarifa)}
                 </td>
-                <td style={{ padding: '10px 14px', fontSize: '13px', color: 'var(--positive)', textAlign: 'right', fontFamily: 'var(--mono)', fontWeight: '500' }}>
+                <td style={{ padding: '12px 16px', fontSize: '15px', color: 'var(--positive)', textAlign: 'right', fontFamily: 'var(--display)' }}>
                   {formatARS(p.margenAbs)}
                 </td>
-                <td style={{ padding: '10px 14px', textAlign: 'right' }}>
+                <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                   <span
                     style={{
-                      fontSize: '11px',
-                      fontFamily: 'var(--mono)',
-                      padding: '2px 8px',
-                      borderRadius: '20px',
-                      border: `1px solid ${p.margenPct >= 0.35 ? 'var(--positive)' : p.margenPct >= 0.2 ? '#F59E0B' : 'var(--negative)'}`,
-                      color: p.margenPct >= 0.35 ? 'var(--positive)' : p.margenPct >= 0.2 ? '#F59E0B' : 'var(--negative)',
+                      fontSize: '15px',
+                      fontFamily: 'var(--display)',
+                      color: p.margenPct >= 0.35 ? 'var(--positive)' : p.margenPct >= 0.2 ? 'var(--warning)' : 'var(--negative)',
                     }}
                   >
                     {formatPct(p.margenPct)}
                   </span>
                 </td>
-                <td style={{ padding: '10px 14px' }}>
-                  <span style={{
-                    fontSize: '10px',
-                    fontFamily: 'var(--mono)',
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                    border: `1px solid ${p.estado === 'Realizado' ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}`,
-                    color: p.estado === 'Realizado' ? 'var(--accent)' : 'var(--text-muted)',
-                    background: p.estado === 'Realizado' ? 'rgba(0,212,255,0.08)' : 'transparent',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {p.estado || 'Presupuestado'}
-                  </span>
+                <td style={{ padding: '12px 16px' }}>
+                  {p.estado === 'Realizado' ? (
+                    <span style={{
+                      background: 'linear-gradient(135deg, rgba(255,106,185,0.15), rgba(255,106,185,0.05))',
+                      border: '1px solid rgba(255,106,185,0.4)',
+                      color: '#FF6AB9',
+                      fontFamily: 'var(--sans)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {p.estado}
+                    </span>
+                  ) : (
+                    <span style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--sans)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {p.estado || 'Presupuestado'}
+                    </span>
+                  )}
                 </td>
                 {(role === 'Admin' || role === 'DEV') && (
-                  <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => onEdit(p)}
                         title="Editar"
-                        style={{ color: 'var(--text-muted)', transition: 'color 0.15s', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
-                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
-                        onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+                        style={{
+                          color: '#FF6AB9',
+                          border: '1px solid rgba(255,106,185,0.25)',
+                          borderRadius: '6px',
+                          padding: '4px 10px',
+                          background: 'none',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--sans)',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'border-color 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.6)')}
+                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.25)')}
                       >
-                        <PencilIcon />
+                        <PencilIcon /> Editar
                       </button>
                       {(role === 'Admin' || role === 'DEV') && (
                         <button
                           onClick={() => handleDelete(p)}
                           title="Eliminar"
-                          style={{ color: 'var(--text-muted)', transition: 'color 0.15s', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
-                          onMouseEnter={e => (e.currentTarget.style.color = 'var(--negative)')}
-                          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+                          style={{
+                            color: '#ff4d6d',
+                            border: '1px solid rgba(255,77,109,0.2)',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            background: 'none',
+                            cursor: 'pointer',
+                            fontFamily: 'var(--sans)',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            transition: 'border-color 0.15s',
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.5)')}
+                          onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.2)')}
                         >
-                          <TrashIcon />
+                          <TrashIcon /> Eliminar
                         </button>
                       )}
                     </div>
@@ -191,7 +238,7 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
           className="flex items-center justify-between px-5 py-3"
           style={{ borderTop: '1px solid var(--border-subtle)' }}
         >
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)' }}>
             {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, total)} de {total}
           </span>
           <div className="flex gap-2">
@@ -206,8 +253,8 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
                 style={{
                   padding: '4px 12px',
                   fontSize: '12px',
-                  fontFamily: 'var(--mono)',
-                  border: '1px solid var(--border)',
+                  fontFamily: 'var(--sans)',
+                  border: '1px solid rgba(255,106,185,0.2)',
                   borderRadius: '6px',
                   background: 'transparent',
                   color: disabled ? 'var(--text-muted)' : 'var(--text-primary)',
@@ -215,8 +262,8 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
                   opacity: disabled ? 0.4 : 1,
                   transition: 'border-color 0.15s',
                 }}
-                onMouseEnter={e => !disabled && (e.target.style.borderColor = 'var(--accent)')}
-                onMouseLeave={e => (e.target.style.borderColor = 'var(--border)')}
+                onMouseEnter={e => !disabled && (e.target.style.borderColor = 'rgba(255,106,185,0.5)')}
+                onMouseLeave={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
               >
                 {label}
               </button>
