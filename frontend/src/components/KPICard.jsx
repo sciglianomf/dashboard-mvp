@@ -1,38 +1,42 @@
 export default function KPICard({ title, value, subtitle, accent = false }) {
   return (
     <div
-      className="relative rounded-xl p-5 transition-all duration-300 group cursor-default"
+      className="relative rounded-xl p-5 transition-all duration-300 group cursor-default overflow-hidden"
       style={{
-        background: 'var(--bg-surface)',
+        background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
         border: '1px solid var(--border)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.boxShadow = '0 0 24px rgba(0,212,255,0.10), 0 1px 3px rgba(0,0,0,0.4)';
-        e.currentTarget.style.borderColor = 'rgba(0,212,255,0.35)';
+        e.currentTarget.style.boxShadow = '0 0 24px rgba(255,106,185,0.12), 0 1px 3px rgba(0,0,0,0.4)';
+        e.currentTarget.style.borderColor = 'rgba(255,106,185,0.35)';
       }}
       onMouseLeave={e => {
         e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.4)';
         e.currentTarget.style.borderColor = 'var(--border)';
       }}
     >
-      {/* Cyan top accent line */}
-      <div
-        className="absolute top-0 left-4 right-4 h-px rounded-full"
-        style={{ background: accent ? 'var(--accent)' : 'rgba(0,212,255,0.4)' }}
-      />
+      {/* Decorative orb */}
+      <div style={{
+        position: 'absolute', top: '-20px', right: '-20px',
+        width: 65, height: 65,
+        background: 'rgba(255,106,185,0.12)',
+        borderRadius: '50%',
+        pointerEvents: 'none',
+      }} />
 
       <p
-        className="text-xs uppercase tracking-widest mb-3 font-medium"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}
+        className="text-xs uppercase tracking-widest mb-3"
+        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, fontSize: '11px' }}
       >
         {title}
       </p>
 
       <p
-        className="text-3xl font-bold leading-none mb-2 tracking-tight"
+        className="leading-none mb-2 tracking-tight"
         style={{
-          fontFamily: 'var(--mono)',
+          fontFamily: 'var(--display)',
+          fontSize: '30px',
           color: accent ? 'var(--accent)' : 'var(--text-primary)',
         }}
       >
@@ -40,10 +44,18 @@ export default function KPICard({ title, value, subtitle, accent = false }) {
       </p>
 
       {subtitle && (
-        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+        <p style={{ color: '#FF6AB9', fontFamily: 'var(--sans)', fontSize: '12px', fontWeight: 300 }}>
           {subtitle}
         </p>
       )}
+
+      {/* Bottom accent line */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: 2,
+        background: 'linear-gradient(90deg, #FF6AB9, transparent)',
+        borderRadius: '0 0 12px 12px',
+      }} />
     </div>
   );
 }
