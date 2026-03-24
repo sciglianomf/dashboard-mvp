@@ -81,6 +81,29 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 
 ---
 
+## Reglas Globales de Implementación
+
+Estas reglas aplican a **todos** los archivos del scope antes de aplicar instrucciones específicas por componente:
+
+### R1 — Eliminar `var(--mono)` en todo el frontend
+Buscar y reemplazar **todas** las ocurrencias de `var(--mono)` en los archivos `.jsx` y `.css` del frontend:
+- Si el elemento es un número grande, título o display de datos → reemplazar por `var(--display)` (Anton)
+- En todos los demás casos (labels, inputs, botones, badges, texto, ejes, subtítulos) → reemplazar por `var(--sans)` (Archivo)
+
+**Criterio de decisión práctico:** si el elemento tiene Anton en la tabla de tipografía → `var(--display)`. Todo lo demás → `var(--sans)`.
+
+Archivos afectados (no exhaustivo — usar search global): `App.jsx`, `Login.jsx`, `Charts.jsx`, `ComparativoChart.jsx`, `ExportButtons.jsx`, `ProjectModal.jsx`, `UserModal.jsx`, `ProjectsTable.jsx`, `UsersPage.jsx`, `router.jsx`.
+
+### R2 — Eliminar todo valor cyan hardcodeado
+Buscar y reemplazar **todas** las ocurrencias de colores cyan hardcodeados en el frontend:
+- `#00D4FF` → `#FF6AB9`
+- `rgba(0,212,255,X)` → `rgba(255,106,185,X)` (mantener la misma opacidad X)
+- `#4A6080` (valor anterior de `--text-muted`) → `var(--text-muted)` o `#6b7280`
+
+Esto cubre casos en `onFocus`/`onBlur`/`onMouseEnter`/`onMouseLeave` handlers, estilos iniciales hardcodeados, props `cursor` de recharts, y el template HTML del PDF en `ExportButtons.jsx`.
+
+---
+
 ## Archivos a Modificar
 
 ### `frontend/index.css`
@@ -160,7 +183,7 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 ---
 
 ### `frontend/src/components/Charts.jsx`
-- `CYAN_SHADES` array → reemplazar por degradado de magentas:
+- `CYAN_SHADES` array → renombrar a `PINK_SHADES` y reemplazar todos los valores:
   ```js
   const PINK_SHADES = [
     '#FF6AB9','#F05EAA','#E0529B','#D0468C','#C03A7D',
@@ -176,6 +199,7 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
   - `entry.name === 'Margen'` → `color: 'var(--positive)'` (sin cambio, token actualizado)
 - Tick `style` en `XAxis`/`YAxis`: `fontFamily: 'var(--sans)'`, `fontSize: 10`, `fill: 'var(--text-muted)'`
 - Ejes `<Bar fill>`: `fill='var(--accent)'` o `fill={PINK_SHADES[i]}`
+- **`<Tooltip cursor>`**: reemplazar `cursor={{ fill: 'rgba(0,212,255,0.04)' }}` por `cursor={{ fill: 'rgba(255,106,185,0.04)' }}` en todos los `<BarChart>` del archivo
 
 ---
 
@@ -262,9 +286,13 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
   - `fontFamily: 'var(--sans)'`, `fontSize: '13px'`
   - Focus border: `'1px solid var(--accent)'` (token actualizado, sin cambio en la llamada)
   - `onBlur` restaurar: `'rgba(255,106,185,0.2)'` (reemplaza el cyan hardcodeado)
-- Botón Guardar activo:
+- **Botón Guardar activo** (`isValid === true`):
   - `background: 'linear-gradient(135deg, #FF6AB9, #e040a0)'`, `color: '#fff'`
   - `fontFamily: 'var(--sans)'`, `fontSize: '13px'`, `fontWeight: 700`
+- **Botón Guardar inactivo/disabled** (`isValid === false`):
+  - `background: 'rgba(255,106,185,0.1)'`, `color: 'rgba(255,106,185,0.4)'`
+  - `border: '1px solid rgba(255,106,185,0.15)'`, `cursor: 'not-allowed'`
+  - Reemplaza el cyan hardcodeado `rgba(0,212,255,0.2)` del estado disabled actual
 - Botón Cancelar: outline `rgba(255,106,185,0.2)`, color muted
 - Preview calculado (prod/margen/mg%): `fontFamily: 'var(--display)'` para los números
 
@@ -291,8 +319,11 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 ---
 
 ### `frontend/src/pages/UsersPage.jsx`
-- Mismas reglas de tabla que `ProjectsTable.jsx`
-- **Role badges:**
+Aplicar las mismas reglas de tabla que `ProjectsTable.jsx` (thead gradiente, th, td, hover, border). Adicionalmente, los siguientes valores hardcodeados de cyan deben ser reemplazados explícitamente:
+- `borderBottom` del header interno: reemplazar `rgba(0,212,255,0.2)` → `rgba(255,106,185,0.2)`
+- Row `onMouseEnter` hover: reemplazar `rgba(0,212,255,0.03)` → `rgba(255,106,185,0.05)`
+
+**Role badges:**
   - DEV: `border: '1px solid var(--accent)'`, `color: 'var(--accent)'`, `fontFamily: 'var(--sans)'`, `fontSize: '11px'`
   - Admin: `border: '1px solid rgba(255,106,185,0.3)'`, `color: 'rgba(255,106,185,0.7)'`
   - Lector: `border: '1px solid rgba(255,255,255,0.1)'`, `color: 'var(--text-muted)'`
@@ -302,7 +333,8 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 ---
 
 ### `frontend/src/components/UserModal.jsx`
-- Mismas reglas que `ProjectModal.jsx`
+Mismas reglas que `ProjectModal.jsx`. Adicionalmente, diferencias explícitas a corregir:
+- Botón Guardar activo: cambiar `background: 'var(--accent)'` → `background: 'linear-gradient(135deg, #FF6AB9, #e040a0)'`, y `color: '#080C10'` → `color: '#fff'`
 
 ---
 
@@ -311,6 +343,12 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
   - `border: '1px solid rgba(255,106,185,0.3)'`, `color: '#9ca3af'`
   - `fontFamily: 'var(--sans)'`, `fontSize: '13px'`
   - Hover border: `'rgba(255,106,185,0.6)'`, color: `'var(--accent)'`
+- **Template HTML del PDF** (string inline usado para generar el PDF con jsPDF): reemplazar todos los valores cyan hardcodeados dentro del HTML string:
+  - `color: #00D4FF` → `color: #FF6AB9`
+  - `rgba(0,212,255,0.15)` → `rgba(255,106,185,0.15)`
+  - `border-top: 1px solid #00D4FF` → `border-top: 1px solid #FF6AB9`
+  - `.cyan { color: #00D4FF; }` → `.cyan { color: #FF6AB9; }`
+  - `style="color:#00D4FF"` → `style="color:#FF6AB9"`
 
 ---
 
@@ -321,14 +359,16 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 - `frontend/src/utils/format.js`
 - `frontend/src/hooks/useData.js`
 - `frontend/src/context/AuthContext.jsx`
-- `frontend/src/router.jsx`, `frontend/src/main.jsx`
+- `frontend/src/main.jsx`
 - Archivos de configuración (`.env`, `vite.config.js`, `package.json`, etc.)
+
+> **`frontend/src/router.jsx`**: contiene un spinner de carga con `fontFamily: 'var(--mono)'`. Debe modificarse para reemplazar ese único uso de `var(--mono)` por `var(--sans)`. Aunque es un cambio mínimo, está incluido en el scope del criterio 12.
 
 ---
 
 ## Criterios de aceptación
 
-1. Ningún valor `#00D4FF` (cyan) permanece en el codebase frontend
+1. Ningún valor `#00D4FF` (cyan) permanece en el codebase frontend — incluye template HTML del PDF en `ExportButtons.jsx` y props `cursor` de recharts en `Charts.jsx`
 2. Ningún uso de `JetBrains Mono` ni `Inter` en producción
 3. Anton y Archivo cargados correctamente desde Google Fonts en `index.css`
 4. KPI cards: gradiente diagonal + orbe + línea inferior magenta + hover con sombra magenta
@@ -337,6 +377,7 @@ Todos los tokens siguientes deben declararse en `:root` en `index.css`. Los marc
 7. Badge `Realizado` en magenta, `Presupuestado` en gris sutil
 8. Login: orbe decorativo + gradiente de card + botón en degradado magenta
 9. Todos los tamaños tipográficos respetan la tabla de referencia (mínimo 11px visible)
-10. Gráficos recharts con barras en magenta / shades de magenta
+10. Gráficos recharts con barras en magenta / shades de magenta, cursor de tooltip en magenta
 11. Todos los `onBlur`/`onMouseLeave` que restauraban colores cyan ahora restauran magenta equivalente
-12. `var(--mono)` no queda en uso — reemplazado por `var(--sans)` o `var(--display)` según contexto
+12. `var(--mono)` no queda en uso — reemplazado por `var(--sans)` o `var(--display)` según contexto (incluye `router.jsx`)
+13. Botón Guardar disabled en `ProjectModal.jsx` y `UserModal.jsx` usa magenta apagado, no cyan
