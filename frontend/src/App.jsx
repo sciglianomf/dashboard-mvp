@@ -1,0 +1,239 @@
+// frontend/src/App.jsx
+import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import KPICard from './components/KPICard';
+import ProjectsTable from './components/ProjectsTable';
+import { ClientesChart, CampañasChart } from './components/Charts';
+import ComparativoChart from './components/ComparativoChart';
+import ExportButtons from './components/ExportButtons';
+import ProjectModal from './components/ProjectModal';
+import { useSummary, useProjects, useCampaigns } from './hooks/useData';
+import { useAuth } from './context/AuthContext';
+import { formatARS } from './utils/format';
+
+const ESTADOS = ['Presupuestado', 'Realizado'];
+
+const selectStyle = {
+  background: 'var(--bg-surface)',
+  border: '1px solid rgba(0,212,255,0.2)',
+  borderRadius: '8px',
+  padding: '7px 28px 7px 12px',
+  color: 'var(--text-primary)',
+  fontSize: '12px',
+  fontFamily: 'var(--mono)',
+  outline: 'none',
+  cursor: 'pointer',
+};
+
+export default function App() {
+  const { user, logout } = useAuth();
+  const [estado, setEstado] = useState('Presupuestado');
+  const [filters, setFilters] = useState({ año: '', cliente: '', sheet: '', elemento: '' });
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [modal, setModal] = useState(null);
+
+  const refresh = useCallback(() => setRefreshKey(k => k + 1), []);
+  const setFilter = (key, val) => setFilters(f => ({ ...f, [key]: val }));
+
+  const { data: summary, loading: loadingSum } = useSummary(estado, refreshKey);
+  const { data: projects, loading: loadingProj } = useProjects(filters, refreshKey);
+  const campaigns = useCampaigns(refreshKey);
+
+  const años = summary?.años || [];
+  const canEdit = user?.rol === 'Admin' || user?.rol === 'DEV';
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
+
+      {/* Header */}
+      <header style={{
+        background: 'var(--bg-base)',
+        borderBottom: '1px solid rgba(0,212,255,0.2)',
+        padding: '14px 32px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h1 style={{ fontFamily: 'var(--mono)', fontSize: '16px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+              {user ? `Hola, ${user.nombre.split(' ')[0]}` : 'INNOVACIÓN & CREATIVIDAD'}
+            </h1>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginTop: '2px' }}>
+              {user ? `Estás viendo la vista de ${estado}` : 'DASHBOARD EJECUTIVO'}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Estado global selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Vista
+              </span>
+              <select
+                value={estado}
+                onChange={e => setEstado(e.target.value)}
+                style={selectStyle}
+                onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+                onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+              >
+                {ESTADOS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+
+            <ExportButtons projects={projects} summary={summary} estado={estado} />
+
+            {user?.rol === 'DEV' && (
+              <Link
+                to="/users"
+                style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textDecoration: 'none', padding: '7px 12px', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '8px' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.4)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)'; }}
+              >
+                Usuarios
+              </Link>
+            )}
+
+            <button
+              onClick={logout}
+              style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '8px', padding: '7px 12px', cursor: 'pointer', fontFamily: 'var(--mono)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ff4d6d'; e.currentTarget.style.borderColor = 'rgba(255,77,109,0.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)'; }}
+            >
+              Salir
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+        {/* KPI Cards — 5 cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
+          {loadingSum ? (
+            [...Array(5)].map((_, i) => (
+              <div key={i} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', height: '112px', opacity: 0.4 }} />
+            ))
+          ) : (
+            <>
+              <KPICard title="Proyectos" value={summary?.totalProjects || 0} subtitle="registros" />
+              <KPICard title="Tarifa Total" value={formatARS(summary?.totalTarifa)} subtitle="facturación" accent />
+              <KPICard title="Producción" value={formatARS(summary?.totalProd)} subtitle="costo total" />
+              <KPICard title="Margen" value={`${summary?.margenPct || 0}%`} subtitle="promedio" />
+              <KPICard title="Ganancia Neta" value={formatARS(summary?.totalMargenAbs)} subtitle="tarifa − producción" accent />
+            </>
+          )}
+        </div>
+
+        {/* Charts */}
+        {!loadingSum && summary && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Comparativo — full width */}
+            <ComparativoChart data={summary.comparativoAnual} />
+            {/* Clientes + Campañas */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <ClientesChart data={summary.byCliente} />
+              <CampañasChart data={summary.byCampaña} />
+            </div>
+          </div>
+        )}
+
+        {/* Table section */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+          {/* Filters bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '4px' }}>
+              Filtros
+            </span>
+
+            <select value={filters.año} onChange={e => setFilter('año', e.target.value)} style={selectStyle}>
+              <option value="">Todos los años</option>
+              {años.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+
+            <select value={filters.sheet} onChange={e => setFilter('sheet', e.target.value)} style={selectStyle}>
+              <option value="">Todas las campañas</option>
+              {campaigns.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <input
+              type="text"
+              placeholder="Buscar cliente…"
+              value={filters.cliente}
+              onChange={e => setFilter('cliente', e.target.value)}
+              style={{ ...selectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
+              onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+            />
+
+            <input
+              type="text"
+              placeholder="Buscar elemento…"
+              value={filters.elemento}
+              onChange={e => setFilter('elemento', e.target.value)}
+              style={{ ...selectStyle, width: '160px', backgroundImage: 'none', paddingRight: '12px' }}
+              onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+            />
+
+            {(filters.año || filters.sheet || filters.cliente || filters.elemento) && (
+              <button
+                onClick={() => setFilters({ año: '', cliente: '', sheet: '', elemento: '' })}
+                style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--mono)', textDecoration: 'underline' }}
+              >
+                limpiar
+              </button>
+            )}
+
+            <div style={{ flex: 1 }} />
+            {canEdit && (
+              <button
+                onClick={() => setModal({ project: null })}
+                style={{
+                  padding: '7px 16px',
+                  fontSize: '12px',
+                  fontFamily: 'var(--mono)',
+                  fontWeight: '600',
+                  border: '1px solid var(--accent)',
+                  borderRadius: '8px',
+                  background: 'transparent',
+                  color: 'var(--accent)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  letterSpacing: '0.05em',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#080C10'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)'; }}
+              >
+                + NUEVO
+              </button>
+            )}
+          </div>
+
+          <ProjectsTable
+            projects={projects}
+            loading={loadingProj}
+            role={user?.rol}
+            onEdit={(p) => setModal({ project: p })}
+            onRefresh={refresh}
+          />
+        </div>
+      </main>
+
+      <footer style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 32px', textAlign: 'center' }}>
+        <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>
+          INNOVACIÓN & CREATIVIDAD · DASHBOARD V2
+        </p>
+      </footer>
+
+      {modal && (
+        <ProjectModal
+          project={modal.project}
+          onClose={() => setModal(null)}
+          onSaved={() => { setModal(null); refresh(); }}
+        />
+      )}
+    </div>
+  );
+}

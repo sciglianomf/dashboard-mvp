@@ -1,0 +1,17 @@
+node_modules
+.env
+dist
+build
+.DS_Store
+data/*.xlsx
+data/*.json
+backend/node_modules
+frontend/node_modules
+backend/.env
+frontend/dist
+.superpowers
+*.log
+*.pid
+data/*.db
+data/*.db-shm
+data/*.db-wal
