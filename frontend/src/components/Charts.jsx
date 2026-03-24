@@ -10,9 +10,9 @@ function CustomTooltip({ active, payload, label }) {
     <div
       className="rounded-lg p-3 text-xs"
       style={{
-        background: 'var(--bg-surface-2)',
-        border: '1px solid var(--border)',
-        fontFamily: 'var(--mono)',
+        background: 'var(--bg-surface)',
+        border: '1px solid rgba(255,106,185,0.2)',
+        fontFamily: 'var(--sans)',
         color: 'var(--text-primary)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
       }}
@@ -27,9 +27,9 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-const CYAN_SHADES = [
-  '#00D4FF', '#00BFEA', '#00AAD5', '#0095C0', '#0080AB',
-  '#006B96', '#005681', '#00416C', '#002C57', '#001742',
+const PINK_SHADES = [
+  '#FF6AB9', '#F05EAA', '#E0529B', '#D0468C', '#C03A7D',
+  '#B02E6E', '#A0225F', '#901650', '#800A41', '#700032',
 ];
 
 export function ClientesChart({ data }) {
@@ -49,7 +49,7 @@ export function ClientesChart({ data }) {
     >
       <p
         className="text-xs uppercase tracking-widest font-medium mb-5"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}
+        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px' }}
       >
         Facturación por Cliente
       </p>
@@ -58,7 +58,7 @@ export function ClientesChart({ data }) {
           <CartesianGrid strokeDasharray="1 4" stroke="rgba(255,255,255,0.04)" vertical={false} />
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 10, fill: '#4A6080', fontFamily: 'var(--mono)' }}
+            tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--sans)' }}
             angle={-40}
             textAnchor="end"
             interval={0}
@@ -67,11 +67,11 @@ export function ClientesChart({ data }) {
           />
           <YAxis
             tickFormatter={v => `$${(v/1e6).toFixed(0)}M`}
-            tick={{ fontSize: 10, fill: '#4A6080', fontFamily: 'var(--mono)' }}
+            tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--sans)' }}
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,212,255,0.04)' }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,106,185,0.04)' }} />
           <Bar dataKey="Tarifa" fill="var(--accent)" radius={[3, 3, 0, 0]} maxBarSize={28} />
           <Bar dataKey="Margen" fill="var(--positive)" radius={[3, 3, 0, 0]} maxBarSize={28} />
         </BarChart>
@@ -84,7 +84,7 @@ export function CampañasChart({ data }) {
   const chartData = (data || []).slice(0, 10).map((c, i) => ({
     name: c.campaña.length > 18 ? c.campaña.slice(0, 18) + '…' : c.campaña,
     Tarifa: c.tarifa,
-    color: CYAN_SHADES[i % CYAN_SHADES.length],
+    color: PINK_SHADES[i % PINK_SHADES.length],
   }));
 
   return (
@@ -94,7 +94,7 @@ export function CampañasChart({ data }) {
     >
       <p
         className="text-xs uppercase tracking-widest font-medium mb-5"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}
+        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px' }}
       >
         Top Campañas
       </p>
@@ -104,19 +104,19 @@ export function CampañasChart({ data }) {
           <XAxis
             type="number"
             tickFormatter={v => `$${(v/1e6).toFixed(0)}M`}
-            tick={{ fontSize: 10, fill: '#4A6080', fontFamily: 'var(--mono)' }}
+            tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--sans)' }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             dataKey="name"
             type="category"
-            tick={{ fontSize: 10, fill: '#4A6080', fontFamily: 'var(--mono)' }}
+            tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--sans)' }}
             width={120}
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,212,255,0.04)' }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,106,185,0.04)' }} />
           <Bar dataKey="Tarifa" radius={[0, 3, 3, 0]} maxBarSize={18}>
             {chartData.map((entry, i) => (
               <Cell key={i} fill={entry.color} />
