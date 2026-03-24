@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
 * {
@@ -8,19 +8,24 @@
 }
 
 :root {
-  --bg-base: #080C10;
-  --bg-surface: #0D1117;
+  --bg-base: #090910;
+  --bg-surface: #0c0c14;
   --bg-surface-2: #111920;
-  --border: rgba(0, 212, 255, 0.15);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --accent: #00D4FF;
-  --accent-dim: rgba(0, 212, 255, 0.08);
+  --border: rgba(255,106,185,0.15);
+  --border-subtle: rgba(255,255,255,0.04);
+  --border-accent: rgba(255,106,185,0.30);
+  --accent: #FF6AB9;
+  --accent-dim: rgba(255,106,185,0.08);
+  --accent-gradient: linear-gradient(135deg, #FF6AB9, #e040a0);
   --text-primary: #E2E8F0;
-  --text-muted: #4A6080;
-  --positive: #00FF88;
+  --text-muted: #6b7280;
+  --text-secondary: #9ca3af;
+  --positive: #34d399;
+  --warning: #f59e0b;
   --negative: #FF4D6D;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Inter', system-ui, sans-serif;
+  --sans: 'Archivo', system-ui, sans-serif;
+  --display: 'Anton', sans-serif;
+  --mono: 'Archivo', system-ui, sans-serif;
 }
 
 body {
@@ -37,13 +42,13 @@ body {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.4); }
+::-webkit-scrollbar-thumb { background: rgba(255,106,185,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,106,185,0.4); }
 
 /* Select native reset */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A6080' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 28px !important;
