@@ -1,11 +1,12 @@
 export default function KPICard({ title, value, subtitle, accent = false }) {
   return (
     <div
-      className="relative rounded-xl p-5 transition-all duration-300 group cursor-default overflow-hidden"
+      className="relative rounded-xl transition-all duration-300 group cursor-default overflow-hidden"
       style={{
         background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
         border: '1px solid var(--border)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+        padding: '28px',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.boxShadow = '0 0 24px rgba(255,106,185,0.12), 0 1px 3px rgba(0,0,0,0.4)';
@@ -26,14 +27,14 @@ export default function KPICard({ title, value, subtitle, accent = false }) {
       }} />
 
       <p
-        className="text-xs uppercase tracking-widest mb-3"
+        className="text-xs uppercase tracking-widest mb-4"
         style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, fontSize: '11px' }}
       >
         {title}
       </p>
 
       <p
-        className="leading-none mb-2 tracking-tight"
+        className="leading-none mb-3 tracking-tight"
         style={{
           fontFamily: 'var(--display)',
           fontSize: '30px',

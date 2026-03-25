@@ -42,7 +42,7 @@ const inputStyle = {
   background: 'var(--bg-base)',
   border: '1px solid rgba(255,106,185,0.2)',
   borderRadius: '8px',
-  padding: '8px 12px',
+  padding: '10px 14px',
   color: 'var(--text-primary)',
   fontSize: '13px',
   fontFamily: 'var(--sans)',
@@ -147,8 +147,8 @@ export default function ProjectModal({ project, onClose, onSaved }) {
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: '1px solid rgba(255,106,185,0.15)' }}
+          className="flex items-center justify-between"
+          style={{ padding: '20px 28px', borderBottom: '1px solid rgba(255,106,185,0.15)' }}
         >
           <p
             className="text-xs uppercase tracking-widest font-semibold"
@@ -168,8 +168,8 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto p-6 flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="overflow-y-auto flex flex-col" style={{ padding: '28px', gap: '20px' }}>
+          <div className="grid grid-cols-2 gap-5">
             <FieldGroup label="Cliente *">
               <Input value={form.cliente} onChange={set('cliente')} placeholder="Ej: Disney" />
               {!form.cliente.trim() && <p className="text-xs" style={{ color: 'var(--negative)' }}>Requerido</p>}
@@ -203,7 +203,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             Costos (ARS)
           </p>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             {[
               ['Costo Inn.', 'costoInn'],
               ['Costo Placa PAI', 'costoPlacaPai'],
@@ -235,7 +235,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-5">
             <FieldGroup label="Situación">
               <Input value={form.situacion} onChange={set('situacion')} placeholder="Ej: En producción" />
             </FieldGroup>
@@ -275,35 +275,44 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
         {/* Footer */}
         <div
-          className="flex items-center justify-end gap-3 px-6 py-4"
-          style={{ borderTop: '1px solid rgba(255,106,185,0.15)' }}
+          className="flex items-center justify-end gap-3"
+          style={{ padding: '20px 28px', borderTop: '1px solid rgba(255,106,185,0.15)' }}
         >
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm transition-all"
             style={{
+              padding: '10px 24px',
+              borderRadius: '10px',
               color: 'var(--text-muted)',
               border: '1px solid rgba(255,106,185,0.2)',
               background: 'transparent',
               fontFamily: 'var(--sans)',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'border-color 0.2s, color 0.2s',
             }}
-            onMouseEnter={e => (e.target.style.borderColor = 'rgba(255,106,185,0.4)')}
-            onMouseLeave={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,106,185,0.5)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,106,185,0.2)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
             disabled={!isValid || saving}
-            className="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
-              background: isValid ? 'linear-gradient(135deg, #FF6AB9, #e040a0)' : 'rgba(255,106,185,0.1)',
-              color: isValid ? '#fff' : 'rgba(255,106,185,0.4)',
+              padding: '10px 28px',
+              borderRadius: '10px',
+              background: isValid ? 'linear-gradient(135deg, #FF6AB9, #e040a0)' : 'rgba(255,106,185,0.08)',
+              color: isValid ? '#fff' : 'rgba(255,106,185,0.35)',
               border: isValid ? 'none' : '1px solid rgba(255,106,185,0.15)',
               cursor: isValid ? 'pointer' : 'not-allowed',
               fontFamily: 'var(--sans)',
               fontWeight: 700,
               fontSize: '13px',
+              letterSpacing: '0.03em',
+              transition: 'opacity 0.2s',
+              opacity: saving ? 0.7 : 1,
             }}
           >
             {saving ? 'Guardando…' : 'Guardar'}
