@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/api';
+import { supabase } from '../lib/supabase';
 import { formatARS, formatPct } from '../utils/format';
 
 const PER_PAGE = 15;
@@ -27,7 +27,9 @@ function TrashIcon() {
 export default function ProjectsTable({ projects, loading, role, onEdit, onRefresh }) {
   const [page, setPage] = useState(1);
 
-  useEffect(() => { setPage(1); }, [projects]);
+  useEffect(() => {
+    setPage(1);
+  }, [projects]);
 
   const total = projects.length;
   const totalPages = Math.ceil(total / PER_PAGE);
@@ -35,11 +37,19 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
 
   async function handleDelete(project) {
     if (!window.confirm(`¿Eliminar "${project.cliente || project.sheet}"? Esta acción es reversible.`)) return;
+
     try {
-      await api.delete(`/api/projects/${project.id}`);
+      const { error } = await supabase
+        .from('projects')
+        .update({ deleted: true })
+        .eq('id', project.id);
+
+      if (error) throw error;
+
       onRefresh();
     } catch (err) {
-      alert('Error al eliminar: ' + err.message);
+      console.error('Error al eliminar proyecto:', err);
+      alert('Error al eliminar: ' + (err.message || 'No se pudo eliminar'));
     }
   }
 
@@ -83,10 +93,12 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
       <div className="overflow-x-auto">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{
-              background: 'linear-gradient(90deg, rgba(255,106,185,0.1), transparent)',
-              borderBottom: '1px solid rgba(255,106,185,0.15)',
-            }}>
+            <tr
+              style={{
+                background: 'linear-gradient(90deg, rgba(255,106,185,0.1), transparent)',
+                borderBottom: '1px solid rgba(255,106,185,0.15)',
+              }}
+            >
               <th style={thStyle}>Cliente</th>
               <th style={thStyle}>Campaña</th>
               <th style={thStyle}>Elemento</th>
@@ -95,110 +107,186 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
               <th style={{ ...thStyle, textAlign: 'right' }}>Margen</th>
               <th style={{ ...thStyle, textAlign: 'right' }}>Mg%</th>
               <th style={thStyle}>Estado</th>
-              {(role === 'Admin' || role === 'DEV') && <th style={{ ...thStyle, textAlign: 'center' }}>Acciones</th>}
+              {(role === 'Admin' || role === 'DEV') && (
+                <th style={{ ...thStyle, textAlign: 'center' }}>Acciones</th>
+              )}
             </tr>
           </thead>
           <tbody>
-            {paginated.map((p, i) => (
-              <tr
-                key={p.id || i}
-                style={{ borderBottom: '1px solid rgba(255,106,185,0.06)', transition: 'background 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,106,185,0.05)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#d1d5db', fontFamily: 'var(--sans)', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {p.cliente || '—'}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#FF6AB9', fontFamily: 'var(--sans)', fontWeight: 600 }}>
-                  {p.sheet}
-                  {p.source === 'local' && (
-                    <span style={{ marginLeft: '6px', fontSize: '9px', color: 'var(--positive)', border: '1px solid var(--positive)', borderRadius: '3px', padding: '1px 4px' }}>NEW</span>
-                  )}
-                  {p.source === 'edited' && (
-                    <span style={{ marginLeft: '6px', fontSize: '9px', color: '#F59E0B', border: '1px solid #F59E0B', borderRadius: '3px', padding: '1px 4px' }}>EDT</span>
-                  )}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {p.elemento || '—'}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '15px', color: '#e2e8f0', textAlign: 'right', fontFamily: 'var(--display)' }}>
-                  {formatARS(p.totalProd)}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '15px', color: '#e2e8f0', textAlign: 'right', fontFamily: 'var(--display)' }}>
-                  {formatARS(p.tarifa)}
-                </td>
-                <td style={{ padding: '12px 16px', fontSize: '15px', color: 'var(--positive)', textAlign: 'right', fontFamily: 'var(--display)' }}>
-                  {formatARS(p.margenAbs)}
-                </td>
-                <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                  <span
+            {paginated.map((p, i) => {
+              const campaignName = p.sheet || p.campaña || '—';
+              const totalProd = p.total_prod ?? p.totalProd ?? 0;
+              const margenAbs = p.margen_abs ?? p.margenAbs ?? 0;
+              const margenPct = p.margen_pct ?? p.margenPct ?? 0;
+
+              return (
+                <tr
+                  key={p.id || i}
+                  style={{
+                    borderBottom: '1px solid rgba(255,106,185,0.06)',
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,106,185,0.05)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <td
                     style={{
-                      fontSize: '15px',
-                      fontFamily: 'var(--display)',
-                      color: p.margenPct >= 0.35 ? 'var(--positive)' : p.margenPct >= 0.2 ? 'var(--warning)' : 'var(--negative)',
+                      padding: '12px 16px',
+                      fontSize: '14px',
+                      color: '#d1d5db',
+                      fontFamily: 'var(--sans)',
+                      maxWidth: '160px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {formatPct(p.margenPct)}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 16px' }}>
-                  {p.estado === 'Realizado' ? (
-                    <span style={{
-                      background: 'linear-gradient(135deg, rgba(255,106,185,0.15), rgba(255,106,185,0.05))',
-                      border: '1px solid rgba(255,106,185,0.4)',
+                    {p.cliente || '—'}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '14px',
                       color: '#FF6AB9',
                       fontFamily: 'var(--sans)',
-                      fontSize: '12px',
                       fontWeight: 600,
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {p.estado}
-                    </span>
-                  ) : (
-                    <span style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                  >
+                    {campaignName}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '14px',
                       color: 'var(--text-muted)',
                       fontFamily: 'var(--sans)',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      padding: '4px 10px',
-                      borderRadius: '6px',
+                      maxWidth: '140px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                    }}>
-                      {p.estado || 'Presupuestado'}
+                    }}
+                  >
+                    {p.elemento || '—'}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '15px',
+                      color: '#e2e8f0',
+                      textAlign: 'right',
+                      fontFamily: 'var(--display)',
+                    }}
+                  >
+                    {formatARS(totalProd)}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '15px',
+                      color: '#e2e8f0',
+                      textAlign: 'right',
+                      fontFamily: 'var(--display)',
+                    }}
+                  >
+                    {formatARS(p.tarifa)}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '15px',
+                      color: 'var(--positive)',
+                      textAlign: 'right',
+                      fontFamily: 'var(--display)',
+                    }}
+                  >
+                    {formatARS(margenAbs)}
+                  </td>
+
+                  <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                    <span
+                      style={{
+                        fontSize: '15px',
+                        fontFamily: 'var(--display)',
+                        color:
+                          margenPct >= 0.35
+                            ? 'var(--positive)'
+                            : margenPct >= 0.2
+                              ? 'var(--warning)'
+                              : 'var(--negative)',
+                      }}
+                    >
+                      {formatPct(margenPct)}
                     </span>
-                  )}
-                </td>
-                {(role === 'Admin' || role === 'DEV') && (
-                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => onEdit(p)}
-                        title="Editar"
+                  </td>
+
+                  <td style={{ padding: '12px 16px' }}>
+                    {p.estado === 'Realizado' ? (
+                      <span
                         style={{
+                          background: 'linear-gradient(135deg, rgba(255,106,185,0.15), rgba(255,106,185,0.05))',
+                          border: '1px solid rgba(255,106,185,0.4)',
                           color: '#FF6AB9',
-                          border: '1px solid rgba(255,106,185,0.25)',
-                          borderRadius: '6px',
-                          padding: '4px 10px',
-                          background: 'none',
-                          cursor: 'pointer',
                           fontFamily: 'var(--sans)',
                           fontSize: '12px',
                           fontWeight: 600,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          transition: 'border-color 0.15s',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          whiteSpace: 'nowrap',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.6)')}
-                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.25)')}
                       >
-                        <PencilIcon /> Editar
-                      </button>
-                      {(role === 'Admin' || role === 'DEV') && (
+                        {p.estado}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          color: 'var(--text-muted)',
+                          fontFamily: 'var(--sans)',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.estado || 'Presupuestado'}
+                      </span>
+                    )}
+                  </td>
+
+                  {(role === 'Admin' || role === 'DEV') && (
+                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => onEdit(p)}
+                          title="Editar"
+                          style={{
+                            color: '#FF6AB9',
+                            border: '1px solid rgba(255,106,185,0.25)',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            background: 'none',
+                            cursor: 'pointer',
+                            fontFamily: 'var(--sans)',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            transition: 'border-color 0.15s',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.6)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,106,185,0.25)')}
+                        >
+                          <PencilIcon /> Editar
+                        </button>
+
                         <button
                           onClick={() => handleDelete(p)}
                           title="Eliminar"
@@ -217,22 +305,21 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
                             gap: '4px',
                             transition: 'border-color 0.15s',
                           }}
-                          onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.5)')}
-                          onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.2)')}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.5)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,77,109,0.2)')}
                         >
                           <TrashIcon /> Eliminar
                         </button>
-                      )}
-                    </div>
-                  </td>
-                )}
-              </tr>
-            ))}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div
           className="flex items-center justify-between px-5 py-3"
@@ -241,10 +328,11 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)' }}>
             {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, total)} de {total}
           </span>
+
           <div className="flex gap-2">
             {[
-              { label: '←', action: () => setPage(p => Math.max(1, p - 1)), disabled: page === 1 },
-              { label: '→', action: () => setPage(p => Math.min(totalPages, p + 1)), disabled: page === totalPages },
+              { label: '←', action: () => setPage((p) => Math.max(1, p - 1)), disabled: page === 1 },
+              { label: '→', action: () => setPage((p) => Math.min(totalPages, p + 1)), disabled: page === totalPages },
             ].map(({ label, action, disabled }) => (
               <button
                 key={label}
@@ -262,8 +350,8 @@ export default function ProjectsTable({ projects, loading, role, onEdit, onRefre
                   opacity: disabled ? 0.4 : 1,
                   transition: 'border-color 0.15s',
                 }}
-                onMouseEnter={e => !disabled && (e.target.style.borderColor = 'rgba(255,106,185,0.5)')}
-                onMouseLeave={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
+                onMouseEnter={(e) => !disabled && (e.target.style.borderColor = 'rgba(255,106,185,0.5)')}
+                onMouseLeave={(e) => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
               >
                 {label}
               </button>
