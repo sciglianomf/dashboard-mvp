@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { formatARSFull, formatPct } from '../utils/format';
 
-const fmt = v => formatARSFull(v);
+const fmt = (v) => formatARSFull(v);
 
 // ─── Elementos ────────────────────────────────────────────────────────────────
 const ELEMENTOS_BASE = [
@@ -71,8 +71,8 @@ const inputStyle = {
   boxSizing: 'border-box',
 };
 
-const onFocus = e => (e.target.style.borderColor = 'var(--accent)');
-const onBlur = e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)');
+const onFocus = (e) => (e.target.style.borderColor = 'var(--accent)');
+const onBlur = (e) => (e.target.style.borderColor = 'rgba(255,106,185,0.2)');
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function Field({ label, children, required, error }) {
@@ -131,7 +131,7 @@ const EMPTY = {
 };
 
 function costoUnitFromForm(f) {
-  const p = v => parseFloat(v) || 0;
+  const p = (v) => parseFloat(v) || 0;
   return p(f.costoInn) + p(f.costoPlacaPai) + p(f.costoLona) + p(f.ws) + p(f.confi);
 }
 
@@ -187,13 +187,13 @@ export default function ProjectModal({ project, onClose, onSaved }) {
     setTouched({});
   }, [project]);
 
-  const set = key => e => setForm(f => ({ ...f, [key]: e.target.value }));
-  const touch = key => () => setTouched(t => ({ ...t, [key]: true }));
-  const num = v => parseFloat(v) || 0;
+  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const touch = (key) => () => setTouched((t) => ({ ...t, [key]: true }));
+  const num = (v) => parseFloat(v) || 0;
 
   function handleTarifaChange(e) {
     const val = e.target.value;
-    setForm(f => {
+    setForm((f) => {
       const t = parseFloat(val) || 0;
       const cu = costoUnitFromForm(f);
       const newMargen = t > 0 && cu > 0 ? ((t - cu) / t * 100).toFixed(1) : '';
@@ -203,7 +203,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
   function handleMargenChange(e) {
     const val = e.target.value;
-    setForm(f => {
+    setForm((f) => {
       const m = parseFloat(val);
       const cu = costoUnitFromForm(f);
       if (!isNaN(m) && m < 100 && cu > 0) {
@@ -272,6 +272,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
       const año = new Date(fechaVal).getFullYear();
 
       const payload = {
+        id: project?.id || crypto.randomUUID(),
         fecha: fechaVal,
         año,
         cliente: form.cliente.trim() || null,
@@ -335,7 +336,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         background: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(4px)',
       }}
-      onClick={e => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         style={{
@@ -382,8 +383,8 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               lineHeight: 1,
               padding: '4px',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
             ✕
           </button>
@@ -410,7 +411,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
                   type="text"
                   value={form.cliente}
                   onChange={set('cliente')}
-                  onBlur={e => {
+                  onBlur={(e) => {
                     touch('cliente')();
                     onBlur(e);
                   }}
@@ -443,7 +444,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
                   onBlur={onBlur}
                 />
                 <datalist id="elementos-list">
-                  {elementos.map(e => (
+                  {elementos.map((e) => (
                     <option key={e} value={e} />
                   ))}
                 </datalist>
@@ -491,7 +492,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
                   type="number"
                   value={form.tarifa}
                   onChange={handleTarifaChange}
-                  onBlur={e => {
+                  onBlur={(e) => {
                     touch('tarifa')();
                     onBlur(e);
                   }}
@@ -663,11 +664,11 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               cursor: 'pointer',
               transition: 'border-color 0.2s, color 0.2s',
             }}
-            onMouseEnter={e => {
+            onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(255,106,185,0.5)';
               e.currentTarget.style.color = 'var(--text-primary)';
             }}
-            onMouseLeave={e => {
+            onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'rgba(255,106,185,0.2)';
               e.currentTarget.style.color = 'var(--text-muted)';
             }}
