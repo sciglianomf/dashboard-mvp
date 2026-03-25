@@ -18,7 +18,7 @@ function FieldGroup({ label, children }) {
     <div className="flex flex-col gap-1">
       <label
         className="text-xs uppercase tracking-widest"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}
+        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, fontSize: '11px' }}
       >
         {label}
       </label>
@@ -29,8 +29,9 @@ function FieldGroup({ label, children }) {
 
 const labelStyle = {
   color: 'var(--text-muted)',
-  fontFamily: 'var(--mono)',
-  fontSize: '10px',
+  fontFamily: 'var(--sans)',
+  fontWeight: 600,
+  fontSize: '11px',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
   display: 'block',
@@ -39,12 +40,12 @@ const labelStyle = {
 
 const inputStyle = {
   background: 'var(--bg-base)',
-  border: '1px solid rgba(0,212,255,0.2)',
+  border: '1px solid rgba(255,106,185,0.2)',
   borderRadius: '8px',
   padding: '8px 12px',
   color: 'var(--text-primary)',
   fontSize: '13px',
-  fontFamily: 'var(--mono)',
+  fontFamily: 'var(--sans)',
   outline: 'none',
   width: '100%',
   transition: 'border-color 0.2s',
@@ -59,7 +60,7 @@ function Input({ value, onChange, type = 'text', placeholder }) {
       placeholder={placeholder}
       style={inputStyle}
       onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-      onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+      onBlur={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
     />
   );
 }
@@ -139,19 +140,19 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         className="w-full max-w-2xl rounded-2xl overflow-hidden flex flex-col"
         style={{
           background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
+          border: '1px solid rgba(255,106,185,0.2)',
           maxHeight: '90vh',
-          boxShadow: '0 0 60px rgba(0,212,255,0.1)',
+          boxShadow: '0 0 60px rgba(255,106,185,0.12)',
         }}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          style={{ borderBottom: '1px solid rgba(255,106,185,0.15)' }}
         >
           <p
             className="text-xs uppercase tracking-widest font-semibold"
-            style={{ color: 'var(--accent)', fontFamily: 'var(--mono)' }}
+            style={{ color: 'var(--accent)', fontFamily: 'var(--sans)', fontWeight: 600, fontSize: '11px' }}
           >
             {isNew ? '+ Nuevo Proyecto' : 'Editar Proyecto'}
           </p>
@@ -193,14 +194,11 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             </FieldGroup>
           </div>
 
-          <div
-            className="h-px"
-            style={{ background: 'var(--border-subtle)' }}
-          />
+          <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
 
           <p
             className="text-xs uppercase tracking-widest"
-            style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}
+            style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, fontSize: '11px' }}
           >
             Costos (ARS)
           </p>
@@ -215,12 +213,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               ['Tarifa *', 'tarifa'],
             ].map(([label, key]) => (
               <FieldGroup key={key} label={label}>
-                <Input
-                  type="number"
-                  value={form[key]}
-                  onChange={set(key)}
-                  placeholder="0"
-                />
+                <Input type="number" value={form[key]} onChange={set(key)} placeholder="0" />
               </FieldGroup>
             ))}
           </div>
@@ -236,8 +229,8 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               ['Margen %', formatPct(margenPct), margenPct >= 0.3 ? 'var(--positive)' : margenPct >= 0 ? '#F59E0B' : 'var(--negative)'],
             ].map(([label, val, color]) => (
               <div key={label}>
-                <p className="text-xs mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>{label}</p>
-                <p className="text-base font-bold" style={{ color, fontFamily: 'var(--mono)' }}>{val}</p>
+                <p className="text-xs mb-1" style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px' }}>{label}</p>
+                <p style={{ color, fontFamily: 'var(--display)', fontSize: '16px' }}>{val}</p>
               </div>
             ))}
           </div>
@@ -271,7 +264,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               rows={2}
               style={{ ...inputStyle, resize: 'vertical', fontFamily: 'var(--sans)' }}
               onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(0,212,255,0.2)')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
             />
           </FieldGroup>
 
@@ -283,18 +276,19 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         {/* Footer */}
         <div
           className="flex items-center justify-end gap-3 px-6 py-4"
-          style={{ borderTop: '1px solid var(--border)' }}
+          style={{ borderTop: '1px solid rgba(255,106,185,0.15)' }}
         >
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm transition-all"
             style={{
               color: 'var(--text-muted)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,106,185,0.2)',
               background: 'transparent',
+              fontFamily: 'var(--sans)',
             }}
-            onMouseEnter={e => (e.target.style.borderColor = 'rgba(255,255,255,0.2)')}
-            onMouseLeave={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+            onMouseEnter={e => (e.target.style.borderColor = 'rgba(255,106,185,0.4)')}
+            onMouseLeave={e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)')}
           >
             Cancelar
           </button>
@@ -303,10 +297,13 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             disabled={!isValid || saving}
             className="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
-              background: isValid ? 'var(--accent)' : 'rgba(0,212,255,0.2)',
-              color: isValid ? '#080C10' : 'var(--text-muted)',
+              background: isValid ? 'linear-gradient(135deg, #FF6AB9, #e040a0)' : 'rgba(255,106,185,0.1)',
+              color: isValid ? '#fff' : 'rgba(255,106,185,0.4)',
+              border: isValid ? 'none' : '1px solid rgba(255,106,185,0.15)',
               cursor: isValid ? 'pointer' : 'not-allowed',
-              fontFamily: 'var(--mono)',
+              fontFamily: 'var(--sans)',
+              fontWeight: 700,
+              fontSize: '13px',
             }}
           >
             {saving ? 'Guardando…' : 'Guardar'}
