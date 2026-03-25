@@ -3,6 +3,7 @@ import {
   ResponsiveContainer, Cell
 } from 'recharts';
 import { formatARS } from '../utils/format';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
@@ -35,22 +36,26 @@ const PINK_SHADES = [
 ];
 
 export function ClientesChart({ data }) {
+  const isMobile = useIsMobile();
+  const maxItems = isMobile ? 6 : 8;
+  const maxLabelLen = isMobile ? 12 : 20;
+
   const chartData = (data || [])
     .filter(c => c.cliente !== 'Sin cliente')
-    .slice(0, 8)
+    .slice(0, maxItems)
     .map(c => ({
-      name: c.cliente.length > 20 ? c.cliente.slice(0, 20) + '…' : c.cliente,
+      name: c.cliente.length > maxLabelLen ? c.cliente.slice(0, maxLabelLen) + '…' : c.cliente,
       Tarifa: c.tarifa,
       Margen: c.margen,
     }));
 
   return (
-    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
-      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: isMobile ? '16px' : '24px' }}>
+      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: isMobile ? '12px' : '20px' }}>
         Facturación por Cliente
       </p>
-      <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} margin={{ top: 4, right: 20, left: 10, bottom: 60 }} barGap={2}>
+      <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
+        <BarChart data={chartData} margin={{ top: 4, right: 12, left: isMobile ? 0 : 10, bottom: isMobile ? 48 : 60 }} barGap={2}>
           <CartesianGrid strokeDasharray="1 4" stroke="rgba(255,255,255,0.04)" vertical={false} />
           <XAxis
             dataKey="name"
@@ -77,19 +82,24 @@ export function ClientesChart({ data }) {
 }
 
 export function CampañasChart({ data }) {
-  const chartData = (data || []).slice(0, 10).map((c, i) => ({
-    name: c.campaña.length > 18 ? c.campaña.slice(0, 18) + '…' : c.campaña,
+  const isMobile = useIsMobile();
+  const maxItems = isMobile ? 7 : 10;
+  const maxLabelLen = isMobile ? 12 : 18;
+  const yAxisWidth = isMobile ? 80 : 110;
+
+  const chartData = (data || []).slice(0, maxItems).map((c, i) => ({
+    name: c.campaña.length > maxLabelLen ? c.campaña.slice(0, maxLabelLen) + '…' : c.campaña,
     Tarifa: c.tarifa,
     color: PINK_SHADES[i % PINK_SHADES.length],
   }));
 
   return (
-    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
-      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: isMobile ? '16px' : '24px' }}>
+      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: isMobile ? '12px' : '20px' }}>
         Top Campañas
       </p>
-      <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 28, left: 0, bottom: 4 }}>
+      <ResponsiveContainer width="100%" height={isMobile ? 210 : 260}>
+        <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: isMobile ? 16 : 28, left: 0, bottom: 4 }}>
           <CartesianGrid strokeDasharray="1 4" stroke="rgba(255,255,255,0.04)" horizontal={false} />
           <XAxis
             type="number"
@@ -102,7 +112,7 @@ export function CampañasChart({ data }) {
             dataKey="name"
             type="category"
             tick={{ fontSize: 10, fill: 'var(--text-muted)', fontFamily: 'var(--sans)' }}
-            width={120}
+            width={yAxisWidth}
             axisLine={false}
             tickLine={false}
           />

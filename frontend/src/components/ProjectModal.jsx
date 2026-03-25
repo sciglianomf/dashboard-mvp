@@ -353,6 +353,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         }}
       >
         <div
+          className="modal-header-bar"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -391,6 +392,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         </div>
 
         <div
+          className="modal-body-scroll"
           style={{
             overflowY: 'auto',
             padding: '28px',
@@ -401,7 +403,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         >
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Proyecto</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div className="modal-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
               <Field
                 label="Cliente"
                 required
@@ -432,7 +434,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
                 />
               </Field>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '14px' }}>
+            <div className="modal-grid-2-1" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '14px' }}>
               <Field label="Elemento">
                 <input
                   list="elementos-list"
@@ -459,7 +461,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Costos unitarios (ARS)</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+            <div className="modal-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
               <Field label="Costo Innovación">
                 <NumInput value={form.costoInn} onChange={set('costoInn')} />
               </Field>
@@ -482,7 +484,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Tarifa</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+            <div className="modal-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
               <Field
                 label="Tarifa unitaria"
                 required
@@ -546,7 +548,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             }}
           >
             <p style={{ ...sectionLabelStyle, color: 'var(--accent)' }}>Resultados en tiempo real</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
+            <div className="modal-results-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
               {[
                 { label: 'Producción', val: fmt(calc.totalProd), color: 'var(--text-primary)' },
                 { label: 'Tarifa total', val: fmt(calc.tarifaFinal), color: 'var(--accent)' },
@@ -584,6 +586,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div
+              className="modal-estado-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: !isNew ? '1fr 1fr' : '1fr',
@@ -640,6 +643,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         </div>
 
         <div
+          className="modal-footer-bar"
           style={{
             display: 'flex',
             alignItems: 'center',

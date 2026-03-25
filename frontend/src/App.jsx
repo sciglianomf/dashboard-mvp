@@ -59,17 +59,20 @@ export default function App() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
 
       {/* Header */}
-      <header style={{
-        background: 'linear-gradient(135deg, rgba(255,106,185,0.1) 0%, rgba(9,9,16,0.97) 60%)',
-        borderBottom: '1px solid rgba(255,106,185,0.2)',
-        padding: '14px 32px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        backdropFilter: 'blur(12px)',
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
+      <header
+        className="dashboard-header"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,106,185,0.1) 0%, rgba(9,9,16,0.97) 60%)',
+          borderBottom: '1px solid rgba(255,106,185,0.2)',
+          padding: '14px 32px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          backdropFilter: 'blur(12px)',
+        }}
+      >
+        <div className="header-inner" style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="header-title">
             <h1 style={{ fontFamily: 'var(--display)', fontSize: '19px', color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {user ? `Hola, ${user.nombre.split(' ')[0]}` : 'INNOVACIÓN & CREATIVIDAD'}
             </h1>
@@ -78,10 +81,10 @@ export default function App() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Estado global selector */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <span className="header-vista-label" style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Vista
               </span>
               <select
@@ -120,10 +123,10 @@ export default function App() {
         </div>
       </header>
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      <main className="dashboard-main" style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
         {/* KPI Cards — 5 cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
+        <div className="kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
           {loadingSum ? (
             [...Array(5)].map((_, i) => (
               <div key={i} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', height: '112px', opacity: 0.4 }} />
@@ -145,7 +148,7 @@ export default function App() {
             {/* Comparativo — full width */}
             <ComparativoChart data={summary.comparativoAnual} />
             {/* Clientes + Campañas */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div className="charts-pair-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <ClientesChart data={summary.byCliente} />
               <CampañasChart data={summary.byCampaña} />
             </div>
@@ -157,22 +160,26 @@ export default function App() {
 
           {/* Filters bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '4px' }}>
+            <span
+              className="filter-section-label"
+              style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: '4px' }}
+            >
               Filtros
             </span>
 
-            <select value={filters.año} onChange={e => setFilter('año', e.target.value)} style={filterSelectStyle}>
+            <select className="filter-select-item" value={filters.año} onChange={e => setFilter('año', e.target.value)} style={filterSelectStyle}>
               <option value="">Todos los años</option>
               {años.map(a => <option key={a} value={a}>{a}</option>)}
             </select>
 
-            <select value={filters.sheet} onChange={e => setFilter('sheet', e.target.value)} style={filterSelectStyle}>
+            <select className="filter-select-item" value={filters.sheet} onChange={e => setFilter('sheet', e.target.value)} style={filterSelectStyle}>
               <option value="">Todas las campañas</option>
               {campaigns.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
 
             <input
               type="text"
+              className="filter-input"
               placeholder="Buscar cliente…"
               value={filters.cliente}
               onChange={e => setFilter('cliente', e.target.value)}
@@ -183,6 +190,7 @@ export default function App() {
 
             <input
               type="text"
+              className="filter-input"
               placeholder="Buscar elemento…"
               value={filters.elemento}
               onChange={e => setFilter('elemento', e.target.value)}
@@ -200,9 +208,10 @@ export default function App() {
               </button>
             )}
 
-            <div style={{ flex: 1 }} />
+            <div className="filter-spacer" style={{ flex: 1 }} />
             {canEdit && (
               <button
+                className="btn-nuevo"
                 onClick={() => setModal({ project: null })}
                 style={{
                   padding: '7px 16px',
@@ -235,7 +244,7 @@ export default function App() {
         </div>
       </main>
 
-      <footer style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 32px', textAlign: 'center' }}>
+      <footer className="dashboard-footer" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 32px', textAlign: 'center' }}>
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, letterSpacing: '0.1em' }}>
           INNOVACIÓN & CREATIVIDAD · DASHBOARD V2
         </p>

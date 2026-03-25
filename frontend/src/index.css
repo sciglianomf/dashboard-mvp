@@ -53,3 +53,147 @@ select {
   background-position: right 10px center;
   padding-right: 28px !important;
 }
+
+/* ─── Responsive Layout Classes ──────────────────────────────────────────── */
+
+/* Base layout helpers */
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title { flex: 1 1 auto; min-width: 0; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dashboard-main {
+  padding: 32px;
+  gap: 28px;
+}
+
+.dashboard-footer { padding: 20px 32px; }
+
+/* Filter bar */
+.filter-spacer { flex: 1; }
+.export-label-short { display: none; }
+
+/* Modal grid classes (default = desktop layout) */
+.modal-grid-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.modal-grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.modal-grid-3   { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.modal-results-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.modal-estado-grid  { display: grid; gap: 14px; }
+
+/* ─── Mobile breakpoint (≤ 768px) ───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Header: wrap title + actions */
+  .dashboard-header { padding: 10px 16px !important; }
+
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  /* Main content */
+  .dashboard-main {
+    padding: 16px !important;
+    gap: 18px !important;
+  }
+
+  .dashboard-footer { padding: 14px 16px !important; }
+
+  /* KPI: 2 columns; 5th card (odd last-child) spans full width */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .kpi-grid > *:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* KPI card: tighter padding + smaller number */
+  .kpi-card-inner { padding: 18px !important; }
+  .kpi-value-text { font-size: 22px !important; }
+
+  /* Charts: stack vertically */
+  .charts-pair-grid { grid-template-columns: 1fr !important; }
+
+  /* Filter bar: each filter takes ~half width, wraps cleanly */
+  .filter-section-label { width: 100%; margin-right: 0 !important; }
+  .filter-select-item   { flex: 1 1 130px; }
+  .filter-input         { width: auto !important; flex: 1 1 130px; }
+  .filter-spacer        { display: none; }
+  .btn-nuevo            { margin-left: auto; }
+
+  /* Export buttons: compact icon labels */
+  .export-label-full  { display: none; }
+  .export-label-short { display: inline; }
+  .export-btn         { padding: 7px 10px !important; }
+
+  /* Hide "Vista" text label on mobile to save header space */
+  .header-vista-label { display: none; }
+
+  /* Modal: reduce padding, stack grids */
+  .modal-body-scroll { padding: 16px !important; gap: 18px !important; }
+  .modal-header-bar  { padding: 12px 16px !important; }
+  .modal-footer-bar  { padding: 12px 16px !important; }
+
+  .modal-grid-2        { grid-template-columns: 1fr !important; }
+  .modal-grid-2-1      { grid-template-columns: 1fr !important; }
+  .modal-grid-3        { grid-template-columns: 1fr 1fr !important; }
+  .modal-results-grid  { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .modal-estado-grid   { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Extra-small (≤ 480px) ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .dashboard-main  { padding: 12px !important; gap: 14px !important; }
+  .kpi-grid        { gap: 8px !important; }
+  .modal-grid-3    { grid-template-columns: 1fr !important; }
+  .modal-results-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* ─── UsersPage ──────────────────────────────────────────────────────────── */
+.users-page-inner { padding: 32px 24px 48px; }
+
+.users-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.users-page-title { font-size: 40px; }
+
+.users-table-wrap { overflow-x: auto; }
+
+@media (max-width: 768px) {
+  .users-page-inner  { padding: 16px 16px 32px !important; }
+  .users-page-header { flex-wrap: wrap; }
+  .users-page-title  { font-size: 26px !important; }
+}
+
+/* ─── Login ──────────────────────────────────────────────────────────────── */
+.login-card { padding: 40px; }
+
+@media (max-width: 480px) {
+  .login-card { padding: 24px !important; }
+}

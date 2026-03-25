@@ -95,20 +95,24 @@ export default function ExportButtons({ projects, summary, estado }) {
   return (
     <div className="flex gap-2">
       <button
+        className="export-btn"
         style={btnBase}
         onClick={() => exportToExcel(projects)}
         onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)'; }}
       >
-        ↓ Excel
+        <span className="export-label-full">↓ Excel</span>
+        <span className="export-label-short">XLS</span>
       </button>
       <button
+        className="export-btn"
         style={btnBase}
         onClick={() => exportToPDF(projects, summary, estado)}
         onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)'; }}
       >
-        ↓ PDF
+        <span className="export-label-full">↓ PDF</span>
+        <span className="export-label-short">PDF</span>
       </button>
     </div>
   );

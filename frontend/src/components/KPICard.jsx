@@ -1,7 +1,7 @@
 export default function KPICard({ title, value, subtitle, accent = false }) {
   return (
     <div
-      className="relative rounded-xl transition-all duration-300 group cursor-default overflow-hidden"
+      className="relative rounded-xl transition-all duration-300 group cursor-default overflow-hidden kpi-card-inner"
       style={{
         background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
         border: '1px solid var(--border)',
@@ -34,7 +34,7 @@ export default function KPICard({ title, value, subtitle, accent = false }) {
       </p>
 
       <p
-        className="leading-none mb-3 tracking-tight"
+        className="leading-none mb-3 tracking-tight kpi-value-text"
         style={{
           fontFamily: 'var(--display)',
           fontSize: '30px',

@@ -44,18 +44,22 @@ export default function Login() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      padding: '16px',
     }}>
-      <div style={{
-        position: 'relative',
-        background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
-        border: '1px solid rgba(255,106,185,0.2)',
-        borderRadius: '16px',
-        padding: '40px',
-        width: '100%',
-        maxWidth: '380px',
-        overflow: 'hidden',
-        boxShadow: '0 0 60px rgba(255,106,185,0.08)',
-      }}>
+      <div
+        className="login-card"
+        style={{
+          position: 'relative',
+          background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
+          border: '1px solid rgba(255,106,185,0.2)',
+          borderRadius: '16px',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '380px',
+          overflow: 'hidden',
+          boxShadow: '0 0 60px rgba(255,106,185,0.08)',
+        }}
+      >
         {/* Decorative orb */}
         <div style={{ position: 'absolute', top: '-25px', right: '-25px', width: 80, height: 80, background: 'rgba(255,106,185,0.12)', borderRadius: '50%', pointerEvents: 'none' }} />
 

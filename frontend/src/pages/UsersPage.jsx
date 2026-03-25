@@ -38,6 +38,7 @@ export default function UsersPage() {
       }}
     >
       <div
+        className="users-page-inner"
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
@@ -45,6 +46,7 @@ export default function UsersPage() {
         }}
       >
         <div
+          className="users-page-header"
           style={{
             display: 'flex',
             alignItems: 'flex-start',
@@ -55,6 +57,7 @@ export default function UsersPage() {
         >
           <div>
             <h1
+              className="users-page-title"
               style={{
                 fontFamily: 'var(--display)',
                 fontSize: '40px',
@@ -112,6 +115,7 @@ export default function UsersPage() {
         </div>
 
         <div
+          className="users-table-wrap"
           style={{
             background: 'linear-gradient(135deg, rgba(255,106,185,0.04) 0%, rgba(9,9,16,0.98) 100%)',
             border: '1px solid rgba(255,106,185,0.15)',
