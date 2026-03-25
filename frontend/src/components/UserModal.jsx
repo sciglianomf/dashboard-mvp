@@ -45,38 +45,63 @@ export default function UserModal({ user, onClose, onSaved }) {
   }
 
   const overlayStyle = {
-    position: 'fixed', inset: 0, background: 'rgba(8,12,16,0.85)',
+    position: 'fixed', inset: 0, background: 'rgba(9,9,16,0.85)',
+    backdropFilter: 'blur(4px)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50,
   };
   const modalStyle = {
-    background: 'var(--bg-surface)', border: '1px solid rgba(0,212,255,0.2)',
+    position: 'relative',
+    background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
+    border: '1px solid rgba(255,106,185,0.2)',
     borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
+    overflow: 'hidden',
+    boxShadow: '0 0 60px rgba(255,106,185,0.12)',
   };
   const inputStyle = {
-    width: '100%', background: 'var(--bg-base)', border: '1px solid rgba(0,212,255,0.2)',
+    width: '100%', background: 'var(--bg-base)', border: '1px solid rgba(255,106,185,0.2)',
     borderRadius: '8px', padding: '9px 12px', color: 'var(--text-primary)',
-    fontSize: '13px', fontFamily: 'var(--mono)', outline: 'none', boxSizing: 'border-box',
+    fontSize: '13px', fontFamily: 'var(--sans)', outline: 'none', boxSizing: 'border-box',
   };
   const labelStyle = {
-    fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)',
-    letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '5px',
+    fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)',
+    fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '5px',
   };
 
   return (
     <div style={overlayStyle} onClick={onClose}>
       <div style={modalStyle} onClick={e => e.stopPropagation()}>
-        <h2 style={{ fontFamily: 'var(--mono)', fontSize: '13px', color: 'var(--accent)', marginBottom: '24px', letterSpacing: '0.1em' }}>
+        {/* Decorative orb */}
+        <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: 65, height: 65, background: 'rgba(255,106,185,0.12)', borderRadius: '50%', pointerEvents: 'none' }} />
+
+        <h2 style={{ fontFamily: 'var(--display)', fontSize: '16px', color: 'var(--accent)', marginBottom: '24px', letterSpacing: '0.05em' }}>
           {isNew ? 'NUEVO USUARIO' : 'EDITAR USUARIO'}
         </h2>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
             <label style={labelStyle}>Nombre completo</label>
-            <input style={inputStyle} value={form.nombre} onChange={e => set('nombre', e.target.value)} placeholder="Juan Pérez" required />
+            <input
+              style={inputStyle}
+              value={form.nombre}
+              onChange={e => set('nombre', e.target.value)}
+              placeholder="Juan Pérez"
+              required
+              onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,106,185,0.2)'}
+            />
           </div>
           <div>
             <label style={labelStyle}>Email corporativo</label>
-            <input style={inputStyle} type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="usuario@american-ads.com" required />
+            <input
+              style={inputStyle}
+              type="email"
+              value={form.email}
+              onChange={e => set('email', e.target.value)}
+              placeholder="usuario@american-ads.com"
+              required
+              onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,106,185,0.2)'}
+            />
           </div>
           <div>
             <label style={labelStyle}>PIN {!isNew && '(dejar vacío para no cambiar)'}</label>
@@ -87,26 +112,47 @@ export default function UserModal({ user, onClose, onSaved }) {
               onChange={e => set('pin', e.target.value.replace(/\D/g, '').slice(0, 4))}
               placeholder={isNew ? '••••' : 'Sin cambios'}
               maxLength={4}
+              onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,106,185,0.2)'}
             />
           </div>
           <div>
             <label style={labelStyle}>Rol</label>
-            <select style={inputStyle} value={form.rol} onChange={e => set('rol', e.target.value)}>
+            <select
+              style={inputStyle}
+              value={form.rol}
+              onChange={e => set('rol', e.target.value)}
+            >
               {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
 
           {error && (
-            <p style={{ fontSize: '11px', color: '#ff4d6d', fontFamily: 'var(--mono)', margin: 0, padding: '8px 12px', background: 'rgba(255,77,109,0.08)', borderRadius: '6px' }}>
+            <p style={{ fontSize: '11px', color: '#ff4d6d', fontFamily: 'var(--sans)', margin: 0, padding: '8px 12px', background: 'rgba(255,77,109,0.08)', borderRadius: '6px' }}>
               {error}
             </p>
           )}
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: '9px', background: 'transparent', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '8px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', fontSize: '12px', cursor: 'pointer' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ flex: 1, padding: '9px', background: 'transparent', border: '1px solid rgba(255,106,185,0.2)', borderRadius: '8px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '12px', cursor: 'pointer' }}
+            >
               Cancelar
             </button>
-            <button type="submit" disabled={loading} style={{ flex: 1, padding: '9px', background: 'var(--accent)', border: 'none', borderRadius: '8px', color: '#080C10', fontFamily: 'var(--mono)', fontWeight: '700', fontSize: '12px', cursor: loading ? 'not-allowed' : 'pointer' }}>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: 1, padding: '9px',
+                background: loading ? 'rgba(255,106,185,0.1)' : 'linear-gradient(135deg, #FF6AB9, #e040a0)',
+                border: 'none', borderRadius: '8px',
+                color: loading ? 'rgba(255,106,185,0.4)' : '#fff',
+                fontFamily: 'var(--sans)', fontWeight: '700', fontSize: '12px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
+            >
               {loading ? 'Guardando…' : (isNew ? 'Crear' : 'Guardar')}
             </button>
           </div>

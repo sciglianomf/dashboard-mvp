@@ -46,25 +46,31 @@ export default function Login() {
       justifyContent: 'center',
     }}>
       <div style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid rgba(0,212,255,0.2)',
+        position: 'relative',
+        background: 'linear-gradient(135deg, rgba(255,106,185,0.13) 0%, rgba(9,9,16,0.95) 100%)',
+        border: '1px solid rgba(255,106,185,0.2)',
         borderRadius: '16px',
         padding: '40px',
         width: '100%',
         maxWidth: '380px',
+        overflow: 'hidden',
+        boxShadow: '0 0 60px rgba(255,106,185,0.08)',
       }}>
+        {/* Decorative orb */}
+        <div style={{ position: 'absolute', top: '-25px', right: '-25px', width: 80, height: 80, background: 'rgba(255,106,185,0.12)', borderRadius: '50%', pointerEvents: 'none' }} />
+
         <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-          <h1 style={{ fontFamily: 'var(--mono)', fontSize: '14px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.1em' }}>
+          <h1 style={{ fontFamily: 'var(--display)', fontSize: '22px', color: 'var(--accent)', letterSpacing: '0.05em' }}>
             INNOVACIÓN & CREATIVIDAD
           </h1>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginTop: '4px' }}>
-            DASHBOARD EJECUTIVO
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', marginTop: '6px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            Dashboard Ejecutivo
           </p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
               Email corporativo
             </label>
             <input
@@ -77,22 +83,22 @@ export default function Login() {
               style={{
                 width: '100%',
                 background: 'var(--bg-base)',
-                border: '1px solid rgba(0,212,255,0.2)',
+                border: '1px solid rgba(255,106,185,0.2)',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 color: 'var(--text-primary)',
                 fontSize: '13px',
-                fontFamily: 'var(--mono)',
+                fontFamily: 'var(--sans)',
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
               onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(0,212,255,0.2)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,106,185,0.2)'}
             />
           </div>
 
           <div>
-            <label style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
               PIN (4 dígitos)
             </label>
             <input
@@ -106,23 +112,23 @@ export default function Login() {
               style={{
                 width: '100%',
                 background: 'var(--bg-base)',
-                border: '1px solid rgba(0,212,255,0.2)',
+                border: '1px solid rgba(255,106,185,0.2)',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 color: 'var(--text-primary)',
                 fontSize: '20px',
                 letterSpacing: '0.4em',
-                fontFamily: 'var(--mono)',
+                fontFamily: 'var(--sans)',
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
               onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(0,212,255,0.2)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,106,185,0.2)'}
             />
           </div>
 
           {error && (
-            <p style={{ fontSize: '11px', color: '#ff4d6d', fontFamily: 'var(--mono)', margin: 0, padding: '8px 12px', background: 'rgba(255,77,109,0.08)', borderRadius: '6px', border: '1px solid rgba(255,77,109,0.2)' }}>
+            <p style={{ fontSize: '11px', color: '#ff4d6d', fontFamily: 'var(--sans)', margin: 0, padding: '8px 12px', background: 'rgba(255,77,109,0.08)', borderRadius: '6px', border: '1px solid rgba(255,77,109,0.2)' }}>
               {error}
             </p>
           )}
@@ -132,11 +138,11 @@ export default function Login() {
             disabled={loading}
             style={{
               padding: '11px',
-              background: loading ? 'rgba(0,212,255,0.1)' : 'var(--accent)',
-              color: loading ? 'var(--accent)' : '#080C10',
-              border: '1px solid var(--accent)',
+              background: loading ? 'rgba(255,106,185,0.1)' : 'linear-gradient(135deg, #FF6AB9, #e040a0)',
+              color: loading ? 'rgba(255,106,185,0.4)' : '#fff',
+              border: 'none',
               borderRadius: '8px',
-              fontFamily: 'var(--mono)',
+              fontFamily: 'var(--sans)',
               fontWeight: '700',
               fontSize: '12px',
               letterSpacing: '0.1em',

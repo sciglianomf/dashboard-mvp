@@ -10,7 +10,7 @@ function ProtectedRoute({ children, onlyRole }) {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--mono)', fontSize: '12px' }}>Verificando sesión…</span>
+      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '12px' }}>Verificando sesión…</span>
     </div>
   );
 
