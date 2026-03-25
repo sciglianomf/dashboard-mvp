@@ -49,7 +49,7 @@ export default function App() {
   const setFilter = (key, val) => setFilters(f => ({ ...f, [key]: val }));
 
   const { data: summary, loading: loadingSum } = useSummary(estado, refreshKey);
-  const { data: projects, loading: loadingProj } = useProjects(filters, refreshKey);
+  const { data: projects, loading: loadingProj } = useProjects({ ...filters, estado }, refreshKey);
   const campaigns = useCampaigns(refreshKey);
 
   const años = summary?.años || [];
@@ -141,11 +141,11 @@ export default function App() {
 
         {/* Charts */}
         {!loadingSum && summary && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Comparativo — full width */}
             <ComparativoChart data={summary.comparativoAnual} />
             {/* Clientes + Campañas */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <ClientesChart data={summary.byCliente} />
               <CampañasChart data={summary.byCampaña} />
             </div>

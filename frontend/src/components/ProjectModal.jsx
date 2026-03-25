@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../utils/api';
-import { formatARS, formatPct } from '../utils/format';
+import { formatARSFull, formatPct } from '../utils/format';
+
+const fmt = v => formatARSFull(v);
 
 // ─── Elementos ────────────────────────────────────────────────────────────────
 const ELEMENTOS_BASE = [
@@ -97,9 +99,14 @@ function Divider() {
 const EMPTY = {
   cliente: '', campaña: '', elemento: '', cantidad: 1,
   costoInn: '', costoPlacaPai: '', costoLona: '', ws: '', confi: '',
-  tarifa: '', descuento: '',
+  tarifa: '', margenObj: '', descuento: '',
   estado: 'Presupuestado', observaciones: '', fecha: today(),
 };
+
+function costoUnitFromForm(f) {
+  const p = v => parseFloat(v) || 0;
+  return p(f.costoInn) + p(f.costoPlacaPai) + p(f.costoLona) + p(f.ws) + p(f.confi);
+}
 
 export default function ProjectModal({ project, onClose, onSaved }) {
   const isNew = !project?.id;
@@ -122,6 +129,13 @@ export default function ProjectModal({ project, onClose, onSaved }) {
         ws:           project.ws           ?? '',
         confi:        project.confiPct     ?? '',
         tarifa:       project.tarifa       ?? '',
+        margenObj:    (() => {
+          const t  = parseFloat(project.tarifa) || 0;
+          const cu = (parseFloat(project.costoInn)||0) + (parseFloat(project.costoPlacaPai)||0)
+                   + (parseFloat(project.costoLona)||0) + (parseFloat(project.ws)||0)
+                   + (parseFloat(project.confiPct)||0);
+          return t > 0 && cu > 0 ? ((t - cu) / t * 100).toFixed(1) : '';
+        })(),
         descuento:    project.descuento    ?? '',
         estado:       project.estado       || 'Presupuestado',
         observaciones:project.observaciones|| '',
@@ -137,6 +151,30 @@ export default function ProjectModal({ project, onClose, onSaved }) {
   const touch = key => () => setTouched(t => ({ ...t, [key]: true }));
   const num = v => parseFloat(v) || 0;
 
+  // Tarifa ↔ Margen objetivo — bidireccional
+  function handleTarifaChange(e) {
+    const val = e.target.value;
+    setForm(f => {
+      const t  = parseFloat(val) || 0;
+      const cu = costoUnitFromForm(f);
+      const newMargen = t > 0 && cu > 0 ? ((t - cu) / t * 100).toFixed(1) : '';
+      return { ...f, tarifa: val, margenObj: newMargen };
+    });
+  }
+
+  function handleMargenChange(e) {
+    const val = e.target.value;
+    setForm(f => {
+      const m  = parseFloat(val);
+      const cu = costoUnitFromForm(f);
+      if (!isNaN(m) && m < 100 && cu > 0) {
+        const newTarifa = Math.round(cu / (1 - m / 100));
+        return { ...f, margenObj: val, tarifa: String(newTarifa) };
+      }
+      return { ...f, margenObj: val };
+    });
+  }
+
   // ─── Live calculations ───────────────────────────────────────────────────
   const calc = useMemo(() => {
     const cant       = Math.max(1, num(form.cantidad));
@@ -148,7 +186,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
     const tarifaFinal= tarifaBase * (1 - desc / 100);
     const margenAbs  = tarifaFinal - totalProd;
     const margenPct  = tarifaFinal > 0 ? margenAbs / tarifaFinal : 0;
-    const markUp     = totalProd  > 0 ? tarifaFinal / totalProd   : 0;
+    const markUp     = totalProd  > 0 ? (tarifaFinal / totalProd) - 1 : 0;
     return { totalProd, tarifaFinal, margenAbs, margenPct, markUp };
   }, [form.costoInn, form.costoPlacaPai, form.costoLona, form.ws, form.confi,
       form.tarifa, form.cantidad, form.descuento]);
@@ -156,8 +194,8 @@ export default function ProjectModal({ project, onClose, onSaved }) {
   const margenColor = calc.margenPct >= 0.3 ? 'var(--positive)'
                     : calc.margenPct >= 0   ? '#F59E0B'
                     :                         'var(--negative)';
-  const markUpColor = calc.markUp >= 1.3 ? 'var(--positive)'
-                    : calc.markUp >= 1   ? '#F59E0B'
+  const markUpColor = calc.markUp >= 0.3 ? 'var(--positive)'
+                    : calc.markUp >= 0   ? '#F59E0B'
                     :                      'var(--negative)';
 
   const isValid = form.cliente.trim() !== '' && num(form.tarifa) > 0;
@@ -293,12 +331,27 @@ export default function ProjectModal({ project, onClose, onSaved }) {
           {/* 3 · Tarifa */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Tarifa</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
               <Field label="Tarifa unitaria" required error={touched.tarifa && !num(form.tarifa) ? 'Requerido' : ''}>
-                <NumInput
-                  value={form.tarifa}
-                  onChange={set('tarifa')}
+                <input
+                  type="number" value={form.tarifa}
+                  onChange={handleTarifaChange}
+                  onBlur={e => { touch('tarifa')(); onBlur(e); }}
+                  onFocus={onFocus}
+                  placeholder="0" style={inputStyle}
                 />
+              </Field>
+              <Field label="Margen objetivo %">
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="number" value={form.margenObj}
+                    onChange={handleMargenChange}
+                    onFocus={onFocus} onBlur={onBlur}
+                    placeholder="ej: 35"
+                    style={inputStyle}
+                  />
+                  <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--accent)', fontFamily: 'var(--sans)', pointerEvents: 'none' }}>→ tarifa</span>
+                </div>
               </Field>
               <Field label="Descuento %">
                 <NumInput value={form.descuento} onChange={set('descuento')} placeholder="0" />
@@ -311,15 +364,15 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             <p style={{ ...sectionLabelStyle, color: 'var(--accent)' }}>Resultados en tiempo real</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
               {[
-                { label: 'Producción',   val: formatARS(calc.totalProd),   color: 'var(--text-primary)' },
-                { label: 'Tarifa total', val: formatARS(calc.tarifaFinal), color: 'var(--accent)' },
-                { label: 'Mark Up',      val: calc.totalProd > 0 ? `${calc.markUp.toFixed(2)}x` : '—', color: markUpColor },
-                { label: 'Margen ARS',   val: formatARS(calc.margenAbs),   color: margenColor },
+                { label: 'Producción',   val: fmt(calc.totalProd),   color: 'var(--text-primary)' },
+                { label: 'Tarifa total', val: fmt(calc.tarifaFinal), color: 'var(--accent)' },
+                { label: 'Mark Up',      val: calc.totalProd > 0 ? `${(calc.markUp * 100).toFixed(1)}%` : '—', color: markUpColor },
+                { label: 'Margen ARS',   val: fmt(calc.margenAbs),   color: margenColor },
                 { label: 'Margen %',     val: formatPct(calc.margenPct),   color: margenColor },
               ].map(({ label, val, color }) => (
                 <div key={label}>
                   <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>{label}</p>
-                  <p style={{ fontFamily: 'var(--display)', fontSize: '20px', color, lineHeight: 1 }}>{val}</p>
+                  <p style={{ fontFamily: 'var(--display)', fontSize: '16px', color, lineHeight: 1 }}>{val}</p>
                 </div>
               ))}
             </div>

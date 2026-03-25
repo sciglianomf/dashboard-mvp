@@ -8,18 +8,20 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div
-      className="rounded-lg p-3 text-xs"
       style={{
         background: 'var(--bg-surface)',
-        border: '1px solid rgba(255,106,185,0.2)',
+        border: '1px solid rgba(255,106,185,0.25)',
+        borderRadius: '10px',
+        padding: '12px 16px',
         fontFamily: 'var(--sans)',
         color: 'var(--text-primary)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+        minWidth: '140px',
       }}
     >
-      <p className="font-semibold mb-2" style={{ color: 'var(--accent)' }}>{label}</p>
+      <p style={{ color: 'var(--accent)', fontWeight: 700, fontSize: '13px', marginBottom: '8px' }}>{label}</p>
       {payload.map((entry, i) => (
-        <p key={i} style={{ color: entry.name === 'Margen' ? 'var(--positive)' : 'var(--accent)' }}>
+        <p key={i} style={{ color: entry.name === 'Margen' ? 'var(--positive)' : 'var(--accent)', fontSize: '12px', marginBottom: i < payload.length - 1 ? '4px' : 0 }}>
           {entry.name}: {formatARS(entry.value)}
         </p>
       ))}
@@ -43,18 +45,12 @@ export function ClientesChart({ data }) {
     }));
 
   return (
-    <div
-      className="rounded-xl p-5"
-      style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
-    >
-      <p
-        className="text-xs uppercase tracking-widest font-medium mb-5"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px' }}
-      >
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
         Facturación por Cliente
       </p>
       <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 60 }} barGap={2}>
+        <BarChart data={chartData} margin={{ top: 4, right: 20, left: 10, bottom: 60 }} barGap={2}>
           <CartesianGrid strokeDasharray="1 4" stroke="rgba(255,255,255,0.04)" vertical={false} />
           <XAxis
             dataKey="name"
@@ -88,18 +84,12 @@ export function CampañasChart({ data }) {
   }));
 
   return (
-    <div
-      className="rounded-xl p-5"
-      style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
-    >
-      <p
-        className="text-xs uppercase tracking-widest font-medium mb-5"
-        style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px' }}
-      >
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+      <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
         Top Campañas
       </p>
       <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+        <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 28, left: 0, bottom: 4 }}>
           <CartesianGrid strokeDasharray="1 4" stroke="rgba(255,255,255,0.04)" horizontal={false} />
           <XAxis
             type="number"

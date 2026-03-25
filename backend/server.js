@@ -38,11 +38,12 @@ function getProjects() {
 app.get('/api/projects', requireAuth, (req, res) => {
   try {
     const projects = getProjects();
-    const { año, cliente, sheet, elemento } = req.query;
+    const { estado, año, cliente, sheet, elemento } = req.query;
     let filtered = projects;
-    if (año) filtered = filtered.filter(p => String(p.año) === año);
-    if (cliente) filtered = filtered.filter(p => p.cliente && p.cliente.toLowerCase().includes(cliente.toLowerCase()));
-    if (sheet) filtered = filtered.filter(p => p.sheet === sheet);
+    if (estado)   filtered = filtered.filter(p => p.estado === estado);
+    if (año)      filtered = filtered.filter(p => String(p.año) === año);
+    if (cliente)  filtered = filtered.filter(p => p.cliente && p.cliente.toLowerCase().includes(cliente.toLowerCase()));
+    if (sheet)    filtered = filtered.filter(p => p.sheet === sheet);
     if (elemento) filtered = filtered.filter(p => p.elemento && p.elemento.toLowerCase().includes(elemento.toLowerCase()));
     res.json({ success: true, data: filtered, total: filtered.length });
   } catch (err) {

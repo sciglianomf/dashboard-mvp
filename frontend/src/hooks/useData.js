@@ -24,16 +24,17 @@ export function useProjects(filters = {}, refreshKey = 0) {
   useEffect(() => {
     setLoading(true);
     const params = {};
-    if (filters.año) params.año = filters.año;
-    if (filters.cliente) params.cliente = filters.cliente;
-    if (filters.sheet) params.sheet = filters.sheet;
+    if (filters.estado)   params.estado   = filters.estado;
+    if (filters.año)      params.año      = filters.año;
+    if (filters.cliente)  params.cliente  = filters.cliente;
+    if (filters.sheet)    params.sheet    = filters.sheet;
     if (filters.elemento) params.elemento = filters.elemento;
 
     api.get('/api/projects', { params })
       .then(res => setData(res.data.data))
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, [filters.año, filters.cliente, filters.sheet, filters.elemento, refreshKey]);
+  }, [filters.estado, filters.año, filters.cliente, filters.sheet, filters.elemento, refreshKey]);
 
   return { data, loading };
 }
