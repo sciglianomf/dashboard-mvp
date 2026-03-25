@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import api from '../utils/api';
+import { supabase } from '../lib/supabase';
 import { formatARSFull, formatPct } from '../utils/format';
 
 const fmt = v => formatARSFull(v);
@@ -38,14 +38,23 @@ const today = () => new Date().toISOString().split('T')[0];
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const sectionLabelStyle = {
-  fontSize: '10px', fontFamily: 'var(--sans)', fontWeight: 700,
-  color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em',
+  fontSize: '10px',
+  fontFamily: 'var(--sans)',
+  fontWeight: 700,
+  color: 'var(--text-muted)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.12em',
 };
 
 const labelStyle = {
-  fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)',
-  fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
-  display: 'block', marginBottom: '5px',
+  fontSize: '10px',
+  color: 'var(--text-muted)',
+  fontFamily: 'var(--sans)',
+  fontWeight: 600,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  display: 'block',
+  marginBottom: '5px',
 };
 
 const inputStyle = {
@@ -63,15 +72,22 @@ const inputStyle = {
 };
 
 const onFocus = e => (e.target.style.borderColor = 'var(--accent)');
-const onBlur  = e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)');
+const onBlur = e => (e.target.style.borderColor = 'rgba(255,106,185,0.2)');
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function Field({ label, children, required, error }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={labelStyle}>{label}{required && <span style={{ color: 'var(--accent)', marginLeft: 2 }}>*</span>}</label>
+      <label style={labelStyle}>
+        {label}
+        {required && <span style={{ color: 'var(--accent)', marginLeft: 2 }}>*</span>}
+      </label>
       {children}
-      {error && <p style={{ fontSize: '11px', color: 'var(--negative)', marginTop: 0 }}>{error}</p>}
+      {error && (
+        <p style={{ fontSize: '11px', color: 'var(--negative)', marginTop: 0 }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -97,10 +113,21 @@ function Divider() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const EMPTY = {
-  cliente: '', campaña: '', elemento: '', cantidad: 1,
-  costoInn: '', costoPlacaPai: '', costoLona: '', ws: '', confi: '',
-  tarifa: '', margenObj: '', descuento: '',
-  estado: 'Presupuestado', observaciones: '', fecha: today(),
+  cliente: '',
+  campaña: '',
+  elemento: '',
+  cantidad: 1,
+  costoInn: '',
+  costoPlacaPai: '',
+  costoLona: '',
+  ws: '',
+  confi: '',
+  tarifa: '',
+  margenObj: '',
+  descuento: '',
+  estado: 'Presupuestado',
+  observaciones: '',
+  fecha: today(),
 };
 
 function costoUnitFromForm(f) {
@@ -118,28 +145,41 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
   useEffect(() => {
     if (project) {
+      const costoInn = project.costo_inn ?? project.costoInn ?? '';
+      const costoPlacaPai = project.costo_placa_pai ?? project.costoPlacaPai ?? '';
+      const costoLona = project.costo_lona ?? project.costoLona ?? '';
+      const ws = project.ws ?? '';
+      const confiPct = project.confi_pct ?? project.confiPct ?? '';
+      const tarifa = project.tarifa ?? '';
+      const fecha = project.fecha ?? today();
+      const observaciones = project.observaciones ?? '';
+      const estado = project.estado || 'Presupuestado';
+
       setForm({
-        cliente:      project.cliente      || '',
-        campaña:      project.campaña      || '',
-        elemento:     project.elemento     || '',
-        cantidad:     project.cantidad     ?? 1,
-        costoInn:     project.costoInn     ?? '',
-        costoPlacaPai:project.costoPlacaPai?? '',
-        costoLona:    project.costoLona    ?? '',
-        ws:           project.ws           ?? '',
-        confi:        project.confiPct     ?? '',
-        tarifa:       project.tarifa       ?? '',
-        margenObj:    (() => {
-          const t  = parseFloat(project.tarifa) || 0;
-          const cu = (parseFloat(project.costoInn)||0) + (parseFloat(project.costoPlacaPai)||0)
-                   + (parseFloat(project.costoLona)||0) + (parseFloat(project.ws)||0)
-                   + (parseFloat(project.confiPct)||0);
+        cliente: project.cliente || '',
+        campaña: project.campaña || '',
+        elemento: project.elemento || '',
+        cantidad: project.cantidad ?? 1,
+        costoInn,
+        costoPlacaPai,
+        costoLona,
+        ws,
+        confi: confiPct,
+        tarifa,
+        margenObj: (() => {
+          const t = parseFloat(tarifa) || 0;
+          const cu =
+            (parseFloat(costoInn) || 0) +
+            (parseFloat(costoPlacaPai) || 0) +
+            (parseFloat(costoLona) || 0) +
+            (parseFloat(ws) || 0) +
+            (parseFloat(confiPct) || 0);
           return t > 0 && cu > 0 ? ((t - cu) / t * 100).toFixed(1) : '';
         })(),
-        descuento:    project.descuento    ?? '',
-        estado:       project.estado       || 'Presupuestado',
-        observaciones:project.observaciones|| '',
-        fecha:        project.fecha        || today(),
+        descuento: project.descuento ?? '',
+        estado,
+        observaciones,
+        fecha,
       });
     } else {
       setForm({ ...EMPTY, fecha: today() });
@@ -151,11 +191,10 @@ export default function ProjectModal({ project, onClose, onSaved }) {
   const touch = key => () => setTouched(t => ({ ...t, [key]: true }));
   const num = v => parseFloat(v) || 0;
 
-  // Tarifa ↔ Margen objetivo — bidireccional
   function handleTarifaChange(e) {
     const val = e.target.value;
     setForm(f => {
-      const t  = parseFloat(val) || 0;
+      const t = parseFloat(val) || 0;
       const cu = costoUnitFromForm(f);
       const newMargen = t > 0 && cu > 0 ? ((t - cu) / t * 100).toFixed(1) : '';
       return { ...f, tarifa: val, margenObj: newMargen };
@@ -165,7 +204,7 @@ export default function ProjectModal({ project, onClose, onSaved }) {
   function handleMargenChange(e) {
     const val = e.target.value;
     setForm(f => {
-      const m  = parseFloat(val);
+      const m = parseFloat(val);
       const cu = costoUnitFromForm(f);
       if (!isNaN(m) && m < 100 && cu > 0) {
         const newTarifa = Math.round(cu / (1 - m / 100));
@@ -175,37 +214,56 @@ export default function ProjectModal({ project, onClose, onSaved }) {
     });
   }
 
-  // ─── Live calculations ───────────────────────────────────────────────────
   const calc = useMemo(() => {
-    const cant       = Math.max(1, num(form.cantidad));
-    const costoUnit  = num(form.costoInn) + num(form.costoPlacaPai)
-                     + num(form.costoLona) + num(form.ws) + num(form.confi);
-    const totalProd  = costoUnit * cant;
+    const cant = Math.max(1, num(form.cantidad));
+    const costoUnit =
+      num(form.costoInn) +
+      num(form.costoPlacaPai) +
+      num(form.costoLona) +
+      num(form.ws) +
+      num(form.confi);
+    const totalProd = costoUnit * cant;
     const tarifaBase = num(form.tarifa) * cant;
-    const desc       = Math.min(100, Math.max(0, num(form.descuento)));
-    const tarifaFinal= tarifaBase * (1 - desc / 100);
-    const margenAbs  = tarifaFinal - totalProd;
-    const margenPct  = tarifaFinal > 0 ? margenAbs / tarifaFinal : 0;
-    const markUp     = totalProd  > 0 ? (tarifaFinal / totalProd) - 1 : 0;
+    const desc = Math.min(100, Math.max(0, num(form.descuento)));
+    const tarifaFinal = tarifaBase * (1 - desc / 100);
+    const margenAbs = tarifaFinal - totalProd;
+    const margenPct = tarifaFinal > 0 ? margenAbs / tarifaFinal : 0;
+    const markUp = totalProd > 0 ? tarifaFinal / totalProd - 1 : 0;
     return { totalProd, tarifaFinal, margenAbs, margenPct, markUp };
-  }, [form.costoInn, form.costoPlacaPai, form.costoLona, form.ws, form.confi,
-      form.tarifa, form.cantidad, form.descuento]);
+  }, [
+    form.costoInn,
+    form.costoPlacaPai,
+    form.costoLona,
+    form.ws,
+    form.confi,
+    form.tarifa,
+    form.cantidad,
+    form.descuento,
+  ]);
 
-  const margenColor = calc.margenPct >= 0.3 ? 'var(--positive)'
-                    : calc.margenPct >= 0   ? '#F59E0B'
-                    :                         'var(--negative)';
-  const markUpColor = calc.markUp >= 0.3 ? 'var(--positive)'
-                    : calc.markUp >= 0   ? '#F59E0B'
-                    :                      'var(--negative)';
+  const margenColor =
+    calc.margenPct >= 0.3
+      ? 'var(--positive)'
+      : calc.margenPct >= 0
+        ? '#F59E0B'
+        : 'var(--negative)';
+
+  const markUpColor =
+    calc.markUp >= 0.3
+      ? 'var(--positive)'
+      : calc.markUp >= 0
+        ? '#F59E0B'
+        : 'var(--negative)';
 
   const isValid = form.cliente.trim() !== '' && num(form.tarifa) > 0;
 
-  // ─── Save ────────────────────────────────────────────────────────────────
   async function handleSave() {
     setTouched({ cliente: true, tarifa: true });
     if (!isValid) return;
+
     setSaving(true);
     setError('');
+
     try {
       saveCustomElemento(form.elemento);
       setElementos(getElementos());
@@ -214,96 +272,180 @@ export default function ProjectModal({ project, onClose, onSaved }) {
       const año = new Date(fechaVal).getFullYear();
 
       const payload = {
-        cliente:       form.cliente,
-        campaña:       form.campaña,
-        elemento:      form.elemento,
-        cantidad:      num(form.cantidad) || 1,
-        costoInn:      num(form.costoInn),
-        costoPlacaPai: num(form.costoPlacaPai),
-        costoLona:     num(form.costoLona),
-        ws:            num(form.ws),
-        confiPct:      num(form.confi),
-        tarifa:        num(form.tarifa),
-        descuento:     num(form.descuento),
-        estado:        form.estado,
-        observaciones: form.observaciones,
-        fecha:         fechaVal,
+        fecha: fechaVal,
         año,
-        sheet: project?.sheet || form.campaña || form.cliente || 'Local',
-        // Computed — stored for export/table display
-        totalProd:   calc.totalProd,
-        tarifaFinal: calc.tarifaFinal,
-        margenAbs:   calc.margenAbs,
-        margenPct:   calc.margenPct,
-        markUp:      calc.markUp,
+        cliente: form.cliente.trim() || null,
+        campaña: form.campaña.trim() || null,
+        sheet: project?.sheet || form.campaña?.trim() || form.cliente?.trim() || 'Local',
+        estado: form.estado || 'Presupuestado',
+        formato: project?.formato || null,
+        elemento: form.elemento.trim() || null,
+        cantidad: num(form.cantidad) || 1,
+        detalle: project?.detalle || null,
+        elemento_dueno: project?.elemento_dueno ?? project?.elementoDueno ?? null,
+        ubicacion: project?.ubicacion || null,
+        situacion: project?.situacion || null,
+        realizacion: project?.realizacion || null,
+        fecha_campaña: project?.fecha_campaña ?? project?.fechaCampaña ?? null,
+        observaciones: form.observaciones || null,
+        costo_inn: num(form.costoInn),
+        costo_placa_pai: num(form.costoPlacaPai),
+        costo_lona: num(form.costoLona),
+        confi_pct: num(form.confi),
+        total_prod: calc.totalProd,
+        tarifa: calc.tarifaFinal,
+        mark_up: calc.markUp,
+        margen_pct: calc.margenPct,
+        margen_abs: calc.margenAbs,
+        op_adelanto_cliente: project?.op_adelanto_cliente ?? project?.opAdelantoCliente ?? null,
+        op_saldo_cliente: project?.op_saldo_cliente ?? project?.opSaldoCliente ?? null,
+        deleted: false,
       };
 
       if (isNew) {
-        await api.post('/api/projects', payload);
+        const { error: insertError } = await supabase.from('projects').insert([payload]);
+        if (insertError) throw insertError;
       } else {
-        await api.put(`/api/projects/${project.id}`, payload);
+        const { error: updateError } = await supabase
+          .from('projects')
+          .update(payload)
+          .eq('id', project.id);
+        if (updateError) throw updateError;
       }
+
       onSaved();
     } catch (err) {
+      console.error('Error guardando proyecto:', err);
       setError(err.message || 'Error al guardar');
     } finally {
       setSaving(false);
     }
   }
 
-  // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)' }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        background: 'rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(4px)',
+      }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div style={{ width: '100%', maxWidth: '700px', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '92vh', background: 'var(--bg-surface)', border: '1px solid rgba(255,106,185,0.2)', boxShadow: '0 0 60px rgba(255,106,185,0.12)' }}>
-
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid rgba(255,106,185,0.15)', flexShrink: 0 }}>
-          <p style={{ fontFamily: 'var(--display)', fontSize: '16px', color: 'var(--accent)', letterSpacing: '0.05em' }}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '700px',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '92vh',
+          background: 'var(--bg-surface)',
+          border: '1px solid rgba(255,106,185,0.2)',
+          boxShadow: '0 0 60px rgba(255,106,185,0.12)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '20px 28px',
+            borderBottom: '1px solid rgba(255,106,185,0.15)',
+            flexShrink: 0,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--display)',
+              fontSize: '16px',
+              color: 'var(--accent)',
+              letterSpacing: '0.05em',
+            }}
+          >
             {isNew ? '+ NUEVO PROYECTO' : 'EDITAR PROYECTO'}
           </p>
           <button
             onClick={onClose}
-            style={{ color: 'var(--text-muted)', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '4px' }}
+            style={{
+              color: 'var(--text-muted)',
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              cursor: 'pointer',
+              lineHeight: 1,
+              padding: '4px',
+            }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-          >✕</button>
+          >
+            ✕
+          </button>
         </div>
 
-        {/* ── Body ───────────────────────────────────────────────────────── */}
-        <div style={{ overflowY: 'auto', padding: '28px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          {/* 1 · Proyecto */}
+        <div
+          style={{
+            overflowY: 'auto',
+            padding: '28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Proyecto</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-              <Field label="Cliente" required error={touched.cliente && !form.cliente.trim() ? 'Requerido' : ''}>
+              <Field
+                label="Cliente"
+                required
+                error={touched.cliente && !form.cliente.trim() ? 'Requerido' : ''}
+              >
                 <input
-                  type="text" value={form.cliente} onChange={set('cliente')}
-                  onBlur={e => { touch('cliente')(); onBlur(e); }}
+                  type="text"
+                  value={form.cliente}
+                  onChange={set('cliente')}
+                  onBlur={e => {
+                    touch('cliente')();
+                    onBlur(e);
+                  }}
                   onFocus={onFocus}
-                  placeholder="Ej: Disney" style={inputStyle}
+                  placeholder="Ej: Disney"
+                  style={inputStyle}
                 />
               </Field>
               <Field label="Campaña">
                 <input
-                  type="text" value={form.campaña} onChange={set('campaña')}
-                  placeholder="Ej: Mandalorian" style={inputStyle}
-                  onFocus={onFocus} onBlur={onBlur}
+                  type="text"
+                  value={form.campaña}
+                  onChange={set('campaña')}
+                  placeholder="Ej: Mandalorian"
+                  style={inputStyle}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
                 />
               </Field>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '14px' }}>
               <Field label="Elemento">
                 <input
-                  list="elementos-list" value={form.elemento} onChange={set('elemento')}
-                  placeholder="Seleccioná o escribí un elemento" style={inputStyle}
-                  onFocus={onFocus} onBlur={onBlur}
+                  list="elementos-list"
+                  value={form.elemento}
+                  onChange={set('elemento')}
+                  placeholder="Seleccioná o escribí un elemento"
+                  style={inputStyle}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
                 />
                 <datalist id="elementos-list">
-                  {elementos.map(e => <option key={e} value={e} />)}
+                  {elementos.map(e => (
+                    <option key={e} value={e} />
+                  ))}
                 </datalist>
               </Field>
               <Field label="Cantidad">
@@ -314,43 +456,75 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
           <Divider />
 
-          {/* 2 · Costos */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Costos unitarios (ARS)</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
-              <Field label="Costo Innovación"><NumInput value={form.costoInn}      onChange={set('costoInn')} /></Field>
-              <Field label="Costo Placa PAI"> <NumInput value={form.costoPlacaPai} onChange={set('costoPlacaPai')} /></Field>
-              <Field label="Costo Lona">      <NumInput value={form.costoLona}     onChange={set('costoLona')} /></Field>
-              <Field label="WS">              <NumInput value={form.ws}            onChange={set('ws')} /></Field>
-              <Field label="Confi $">         <NumInput value={form.confi}         onChange={set('confi')} /></Field>
+              <Field label="Costo Innovación">
+                <NumInput value={form.costoInn} onChange={set('costoInn')} />
+              </Field>
+              <Field label="Costo Placa PAI">
+                <NumInput value={form.costoPlacaPai} onChange={set('costoPlacaPai')} />
+              </Field>
+              <Field label="Costo Lona">
+                <NumInput value={form.costoLona} onChange={set('costoLona')} />
+              </Field>
+              <Field label="WS">
+                <NumInput value={form.ws} onChange={set('ws')} />
+              </Field>
+              <Field label="Confi $">
+                <NumInput value={form.confi} onChange={set('confi')} />
+              </Field>
             </div>
           </section>
 
           <Divider />
 
-          {/* 3 · Tarifa */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Tarifa</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
-              <Field label="Tarifa unitaria" required error={touched.tarifa && !num(form.tarifa) ? 'Requerido' : ''}>
+              <Field
+                label="Tarifa unitaria"
+                required
+                error={touched.tarifa && !num(form.tarifa) ? 'Requerido' : ''}
+              >
                 <input
-                  type="number" value={form.tarifa}
+                  type="number"
+                  value={form.tarifa}
                   onChange={handleTarifaChange}
-                  onBlur={e => { touch('tarifa')(); onBlur(e); }}
+                  onBlur={e => {
+                    touch('tarifa')();
+                    onBlur(e);
+                  }}
                   onFocus={onFocus}
-                  placeholder="0" style={inputStyle}
+                  placeholder="0"
+                  style={inputStyle}
                 />
               </Field>
               <Field label="Margen objetivo %">
                 <div style={{ position: 'relative' }}>
                   <input
-                    type="number" value={form.margenObj}
+                    type="number"
+                    value={form.margenObj}
                     onChange={handleMargenChange}
-                    onFocus={onFocus} onBlur={onBlur}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                     placeholder="ej: 35"
                     style={inputStyle}
                   />
-                  <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--accent)', fontFamily: 'var(--sans)', pointerEvents: 'none' }}>→ tarifa</span>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      right: 10,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      fontSize: '10px',
+                      color: 'var(--accent)',
+                      fontFamily: 'var(--sans)',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    → tarifa
+                  </span>
                 </div>
               </Field>
               <Field label="Descuento %">
@@ -359,20 +533,47 @@ export default function ProjectModal({ project, onClose, onSaved }) {
             </div>
           </section>
 
-          {/* 4 · Resultados live */}
-          <div style={{ background: 'rgba(9,9,16,0.8)', border: '1px solid rgba(255,106,185,0.2)', borderRadius: '12px', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div
+            style={{
+              background: 'rgba(9,9,16,0.8)',
+              border: '1px solid rgba(255,106,185,0.2)',
+              borderRadius: '12px',
+              padding: '20px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
             <p style={{ ...sectionLabelStyle, color: 'var(--accent)' }}>Resultados en tiempo real</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
               {[
-                { label: 'Producción',   val: fmt(calc.totalProd),   color: 'var(--text-primary)' },
+                { label: 'Producción', val: fmt(calc.totalProd), color: 'var(--text-primary)' },
                 { label: 'Tarifa total', val: fmt(calc.tarifaFinal), color: 'var(--accent)' },
-                { label: 'Mark Up',      val: calc.totalProd > 0 ? `${(calc.markUp * 100).toFixed(1)}%` : '—', color: markUpColor },
-                { label: 'Margen ARS',   val: fmt(calc.margenAbs),   color: margenColor },
-                { label: 'Margen %',     val: formatPct(calc.margenPct),   color: margenColor },
+                {
+                  label: 'Mark Up',
+                  val: calc.totalProd > 0 ? `${(calc.markUp * 100).toFixed(1)}%` : '—',
+                  color: markUpColor,
+                },
+                { label: 'Margen ARS', val: fmt(calc.margenAbs), color: margenColor },
+                { label: 'Margen %', val: formatPct(calc.margenPct), color: margenColor },
               ].map(({ label, val, color }) => (
                 <div key={label}>
-                  <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>{label}</p>
-                  <p style={{ fontFamily: 'var(--display)', fontSize: '16px', color, lineHeight: 1 }}>{val}</p>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--sans)',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    {label}
+                  </p>
+                  <p style={{ fontFamily: 'var(--display)', fontSize: '16px', color, lineHeight: 1 }}>
+                    {val}
+                  </p>
                 </div>
               ))}
             </div>
@@ -380,9 +581,14 @@ export default function ProjectModal({ project, onClose, onSaved }) {
 
           <Divider />
 
-          {/* 5 · Info */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: !isNew ? '1fr 1fr' : '1fr', gap: '14px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: !isNew ? '1fr 1fr' : '1fr',
+                gap: '14px',
+              }}
+            >
               <Field label="Estado">
                 <select value={form.estado} onChange={set('estado')} style={inputStyle}>
                   <option value="Presupuestado">Presupuestado</option>
@@ -392,43 +598,101 @@ export default function ProjectModal({ project, onClose, onSaved }) {
               {!isNew && (
                 <Field label="Fecha">
                   <input
-                    type="date" value={form.fecha} onChange={set('fecha')}
-                    style={inputStyle} onFocus={onFocus} onBlur={onBlur}
+                    type="date"
+                    value={form.fecha}
+                    onChange={set('fecha')}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                   />
                 </Field>
               )}
             </div>
             <Field label="Observaciones">
               <textarea
-                value={form.observaciones} onChange={set('observaciones')}
-                placeholder="Notas adicionales..." rows={2}
+                value={form.observaciones}
+                onChange={set('observaciones')}
+                placeholder="Notas adicionales..."
+                rows={2}
                 style={{ ...inputStyle, resize: 'vertical', fontFamily: 'var(--sans)' }}
-                onFocus={onFocus} onBlur={onBlur}
+                onFocus={onFocus}
+                onBlur={onBlur}
               />
             </Field>
           </section>
 
           {error && (
-            <p style={{ fontSize: '12px', color: 'var(--negative)', textAlign: 'center', padding: '8px 12px', background: 'rgba(255,77,109,0.08)', borderRadius: '8px', border: '1px solid rgba(255,77,109,0.2)' }}>
+            <p
+              style={{
+                fontSize: '12px',
+                color: 'var(--negative)',
+                textAlign: 'center',
+                padding: '8px 12px',
+                background: 'rgba(255,77,109,0.08)',
+                borderRadius: '8px',
+                border: '1px solid rgba(255,77,109,0.2)',
+              }}
+            >
               {error}
             </p>
           )}
         </div>
 
-        {/* ── Footer ─────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', padding: '20px 28px', borderTop: '1px solid rgba(255,106,185,0.15)', flexShrink: 0 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            padding: '20px 28px',
+            borderTop: '1px solid rgba(255,106,185,0.15)',
+            flexShrink: 0,
+          }}
+        >
           <button
             onClick={onClose}
-            style={{ padding: '10px 24px', borderRadius: '10px', color: 'var(--text-muted)', border: '1px solid rgba(255,106,185,0.2)', background: 'transparent', fontFamily: 'var(--sans)', fontSize: '13px', fontWeight: 500, cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,106,185,0.5)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,106,185,0.2)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+            style={{
+              padding: '10px 24px',
+              borderRadius: '10px',
+              color: 'var(--text-muted)',
+              border: '1px solid rgba(255,106,185,0.2)',
+              background: 'transparent',
+              fontFamily: 'var(--sans)',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'border-color 0.2s, color 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'rgba(255,106,185,0.5)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'rgba(255,106,185,0.2)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            style={{ padding: '10px 28px', borderRadius: '10px', background: isValid ? 'linear-gradient(135deg, #FF6AB9, #e040a0)' : 'rgba(255,106,185,0.08)', color: isValid ? '#fff' : 'rgba(255,106,185,0.35)', border: isValid ? 'none' : '1px solid rgba(255,106,185,0.15)', cursor: isValid && !saving ? 'pointer' : 'not-allowed', fontFamily: 'var(--sans)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.03em', opacity: saving ? 0.7 : 1, transition: 'opacity 0.2s' }}
+            style={{
+              padding: '10px 28px',
+              borderRadius: '10px',
+              background: isValid
+                ? 'linear-gradient(135deg, #FF6AB9, #e040a0)'
+                : 'rgba(255,106,185,0.08)',
+              color: isValid ? '#fff' : 'rgba(255,106,185,0.35)',
+              border: isValid ? 'none' : '1px solid rgba(255,106,185,0.15)',
+              cursor: isValid && !saving ? 'pointer' : 'not-allowed',
+              fontFamily: 'var(--sans)',
+              fontWeight: 700,
+              fontSize: '13px',
+              letterSpacing: '0.03em',
+              opacity: saving ? 0.7 : 1,
+              transition: 'opacity 0.2s',
+            }}
           >
             {saving ? 'Guardando…' : 'Guardar'}
           </button>
