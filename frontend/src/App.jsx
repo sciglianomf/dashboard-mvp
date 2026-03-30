@@ -55,6 +55,7 @@ const AREA_COLORS = {
   Producción:  { bg: 'rgba(99,179,237,0.12)',  border: 'rgba(99,179,237,0.4)',  text: '#63b3ed' },
   Trade:       { bg: 'rgba(249,115,22,0.12)',  border: 'rgba(249,115,22,0.4)',  text: '#f97316' },
   Finanzas:    { bg: 'rgba(52,211,153,0.12)',  border: 'rgba(52,211,153,0.4)',  text: '#34d399' },
+  Comercial:   { bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.4)', text: '#a78bfa' },
 };
 
 const AREA_LABELS = {
@@ -62,6 +63,7 @@ const AREA_LABELS = {
   Producción: 'Producción',
   Trade: 'Trade',
   Finanzas: 'Finanzas',
+  Comercial: 'Comercial',
 };
 
 // ─── Area Switcher ────────────────────────────────────────────────────────────

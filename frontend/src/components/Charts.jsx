@@ -10,6 +10,7 @@ const AREA_COLORS = {
   Producción:  '#63b3ed',
   Trade:       '#f97316',
   Finanzas:    '#34d399',
+  Comercial:   '#a78bfa',
 };
 
 function CustomTooltip({ active, payload, label }) {

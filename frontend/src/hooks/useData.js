@@ -67,7 +67,7 @@ function buildSummary(projects) {
   }
 
   // ── Ganancia neta por área (para gráfico de Finanzas) ──────────────────
-  const AREA_LIST = ['Creatividad', 'Producción', 'Trade', 'Finanzas'];
+  const AREA_LIST = ['Creatividad', 'Producción', 'Trade', 'Finanzas', 'Comercial'];
   const byArea = {};
   for (const area of AREA_LIST) {
     byArea[area] = { area, tarifa: 0, totalProd: 0, margenAbs: 0, gastoEstructura: 0, gananciaNeta: 0, count: 0 };

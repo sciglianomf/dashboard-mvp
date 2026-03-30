@@ -1,7 +1,7 @@
 // frontend/src/utils/permissions.js
 // V3 — Lógica de permisos por área
 
-export const AREAS = ['Creatividad', 'Producción', 'Trade', 'Finanzas'];
+export const AREAS = ['Creatividad', 'Producción', 'Trade', 'Finanzas', 'Comercial'];
 
 /** Áreas que el usuario puede ver */
 export function getAreasPermitidas(user) {

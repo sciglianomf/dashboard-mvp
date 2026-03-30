@@ -9,6 +9,7 @@ const AREA_COLORS = {
   Producción:  { bg: 'rgba(99,179,237,0.1)',   border: 'rgba(99,179,237,0.35)',  text: '#63b3ed' },
   Trade:       { bg: 'rgba(249,115,22,0.1)',   border: 'rgba(249,115,22,0.35)',  text: '#f97316' },
   Finanzas:    { bg: 'rgba(52,211,153,0.1)',   border: 'rgba(52,211,153,0.35)',  text: '#34d399' },
+  Comercial:   { bg: 'rgba(167,139,250,0.1)',  border: 'rgba(167,139,250,0.35)', text: '#a78bfa' },
 };
 
 function AreaBadge({ area }) {
