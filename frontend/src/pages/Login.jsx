@@ -65,7 +65,7 @@ export default function Login() {
 
         <div style={{ marginBottom: '32px', textAlign: 'center' }}>
           <h1 style={{ fontFamily: 'var(--display)', fontSize: '22px', color: 'var(--accent)', letterSpacing: '0.05em' }}>
-            INNOVACIÓN & CREATIVIDAD
+            AMERICAN ADS
           </h1>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', marginTop: '6px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Dashboard Ejecutivo

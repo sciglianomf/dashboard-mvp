@@ -35,9 +35,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  min-height: 100vh;
-}
+#root { min-height: 100vh; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -54,9 +52,7 @@ select {
   padding-right: 28px !important;
 }
 
-/* ─── Responsive Layout Classes ──────────────────────────────────────────── */
-
-/* Base layout helpers */
+/* ─── Layout base ─────────────────────────────────────────────────────────── */
 .header-inner {
   max-width: 1400px;
   margin: 0 auto;
@@ -66,6 +62,7 @@ select {
 }
 
 .header-title { flex: 1 1 auto; min-width: 0; }
+.header-subtitle { font-size: 12px; }
 
 .header-actions {
   display: flex;
@@ -74,34 +71,60 @@ select {
   flex-shrink: 0;
 }
 
-.dashboard-main {
-  padding: 32px;
-  gap: 28px;
-}
-
+.dashboard-main { padding: 32px; gap: 28px; }
 .dashboard-footer { padding: 20px 32px; }
 
 /* Filter bar */
 .filter-spacer { flex: 1; }
 .export-label-short { display: none; }
 
-/* Modal grid classes (default = desktop layout) */
+/* ─── Area Switcher ───────────────────────────────────────────────────────── */
+.area-switcher-bar {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,106,185,0.08);
+  margin-top: 10px;
+}
+
+.area-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  /* hide scrollbar but allow scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.area-switcher::-webkit-scrollbar { display: none; }
+
+/* ─── KPI Grid ────────────────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  gap: 14px;
+}
+
+/* ─── Modal grid classes (desktop) ───────────────────────────────────────── */
 .modal-grid-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .modal-grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
 .modal-grid-3   { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.modal-results-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.modal-results-grid { display: grid; gap: 14px; }
 .modal-estado-grid  { display: grid; gap: 14px; }
 
-/* ─── Mobile breakpoint (≤ 768px) ───────────────────────────────────────── */
+/* ─── Mobile breakpoint (≤ 768px) ────────────────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* Header: wrap title + actions */
+  /* Header */
   .dashboard-header { padding: 10px 16px !important; }
 
   .header-inner {
     flex-wrap: wrap;
     gap: 8px;
   }
+
+  .header-title { width: 100%; }
+  .header-subtitle { font-size: 11px !important; }
 
   .header-actions {
     width: 100%;
@@ -110,15 +133,21 @@ select {
     justify-content: flex-start;
   }
 
-  /* Main content */
+  /* Area switcher: full width row, scroll horizontal */
+  .area-switcher-bar {
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  /* Main */
   .dashboard-main {
-    padding: 16px !important;
-    gap: 18px !important;
+    padding: 14px !important;
+    gap: 16px !important;
   }
 
   .dashboard-footer { padding: 14px 16px !important; }
 
-  /* KPI: 2 columns; 5th card (odd last-child) spans full width */
+  /* KPI: 2 columnas, último impar en fila completa */
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
@@ -128,32 +157,36 @@ select {
     grid-column: 1 / -1;
   }
 
-  /* KPI card: tighter padding + smaller number */
-  .kpi-card-inner { padding: 18px !important; }
-  .kpi-value-text { font-size: 22px !important; }
+  .kpi-card-inner { padding: 16px !important; }
+  .kpi-value-text { font-size: 20px !important; }
 
-  /* Charts: stack vertically */
+  /* Charts */
   .charts-pair-grid { grid-template-columns: 1fr !important; }
 
-  /* Filter bar: each filter takes ~half width, wraps cleanly */
+  /* Filters bar */
+  .filters-bar {
+    gap: 8px !important;
+  }
+
   .filter-section-label { width: 100%; margin-right: 0 !important; }
   .filter-select-item   { flex: 1 1 130px; }
   .filter-input         { width: auto !important; flex: 1 1 130px; }
+  .filter-op            { flex: 1 1 110px; }
   .filter-spacer        { display: none; }
   .btn-nuevo            { margin-left: auto; }
 
-  /* Export buttons: compact icon labels */
+  /* Export buttons */
   .export-label-full  { display: none; }
   .export-label-short { display: inline; }
   .export-btn         { padding: 7px 10px !important; }
 
-  /* Hide "Vista" text label on mobile to save header space */
+  /* Header labels */
   .header-vista-label { display: none; }
 
-  /* Modal: reduce padding, stack grids */
-  .modal-body-scroll { padding: 16px !important; gap: 18px !important; }
-  .modal-header-bar  { padding: 12px 16px !important; }
-  .modal-footer-bar  { padding: 12px 16px !important; }
+  /* Modal */
+  .modal-body-scroll  { padding: 14px !important; gap: 16px !important; }
+  .modal-header-bar   { padding: 12px 16px !important; }
+  .modal-footer-bar   { padding: 12px 16px !important; }
 
   .modal-grid-2        { grid-template-columns: 1fr !important; }
   .modal-grid-2-1      { grid-template-columns: 1fr !important; }
@@ -164,10 +197,13 @@ select {
 
 /* ─── Extra-small (≤ 480px) ─────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .dashboard-main  { padding: 12px !important; gap: 14px !important; }
+  .dashboard-main  { padding: 10px !important; gap: 12px !important; }
   .kpi-grid        { gap: 8px !important; }
   .modal-grid-3    { grid-template-columns: 1fr !important; }
   .modal-results-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* KPI: 1 columna en pantallas muy chicas */
+  .kpi-grid { grid-template-columns: 1fr 1fr !important; }
 }
 
 /* ─── UsersPage ──────────────────────────────────────────────────────────── */
@@ -182,7 +218,6 @@ select {
 }
 
 .users-page-title { font-size: 40px; }
-
 .users-table-wrap { overflow-x: auto; }
 
 @media (max-width: 768px) {
