@@ -14,26 +14,31 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    // Admin client — único client necesario
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+    // Admin client — para operaciones admin y lookup de perfil
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // --- 1. Extraer y validar JWT del caller ---
+    // --- 1. Verificar JWT del caller con patrón oficial de Supabase ---
     const authHeader = req.headers.get('Authorization') ?? '';
-    const token = authHeader.replace('Bearer ', '').trim();
-
-    if (!token) {
+    if (!authHeader) {
       return json({ error: 'No authorization header' }, 401);
     }
 
-    // getUser(token) valida el JWT contra Supabase Auth
-    const { data: { user }, error: userError } = await admin.auth.getUser(token);
+    // Client del caller: anon key + JWT del usuario vía header (patrón oficial)
+    const callerClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: { user }, error: userError } = await callerClient.auth.getUser();
     if (userError || !user) {
-      return json({ error: `Invalid token: ${userError?.message ?? 'unknown'}` }, 401);
+      return json({ error: `Auth failed: ${userError?.message ?? 'unknown'}` }, 401);
     }
 
-    // --- 2. Verificar que el caller sea DEV ---
+    // --- 2. Verificar que el caller sea DEV (via admin client para evitar RLS) ---
     const { data: profile, error: profileError } = await admin
       .from('profiles')
       .select('rol')
