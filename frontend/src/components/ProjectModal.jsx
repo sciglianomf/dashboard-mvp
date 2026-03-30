@@ -382,7 +382,7 @@ export default function ProjectModal({
     { label: 'Margen ARS', val: fmt(calc.margenAbs),   color: margenColor },
     { label: 'Margen %',   val: formatPct(calc.margenPct), color: margenColor },
     ...(showGastoEstructura
-      ? [{ label: 'Gasto Estructura', val: fmt(calc.gastoEstructuraValor), color: '#34d399' }]
+      ? [{ label: 'Gasto Estructura', val: fmt(calc.gastoEstructuraValor), color: 'var(--negative)' }]
       : []),
   ];
 
