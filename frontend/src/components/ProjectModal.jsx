@@ -151,7 +151,9 @@ export default function ProjectModal({
   onSaved,
   defaultArea = '',
   showGastoEstructura = false,
+  user = null,
 }) {
+  const isDev = user?.rol === 'DEV';
   const isNew = !project?.id;
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -299,11 +301,16 @@ export default function ProjectModal({
       const fechaVal = form.fecha || today();
       const año = new Date(fechaVal).getFullYear();
 
+      // Área: DEV puede elegirla; el resto siempre usa su area_principal
+      const areaFinal = isDev
+        ? (form.area || defaultArea || 'Creatividad')
+        : (user?.area_principal || defaultArea || 'Creatividad');
+
       const payload = {
         id: project?.id || crypto.randomUUID(),
         fecha: fechaVal,
         año,
-        area: form.area || defaultArea || 'Creatividad',
+        area: areaFinal,
         op_numero: form.op_numero?.trim() || null,
         cliente: form.cliente.trim() || null,
         campaña: form.campaña.trim() || null,
@@ -429,20 +436,25 @@ export default function ProjectModal({
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <p style={sectionLabelStyle}>Proyecto</p>
 
-            {/* Área + OP en primera fila */}
-            <div className="modal-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-              <Field label="Área" required>
-                <select
-                  value={form.area}
-                  onChange={set('area')}
-                  style={inputStyle}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                >
-                  <option value="">Seleccionar área…</option>
-                  {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
-                </select>
-              </Field>
+            {/* Área (solo DEV) + OP */}
+            <div
+              className="modal-grid-2"
+              style={{ display: 'grid', gridTemplateColumns: isDev ? '1fr 1fr' : '1fr', gap: '14px' }}
+            >
+              {isDev && (
+                <Field label="Área" required>
+                  <select
+                    value={form.area}
+                    onChange={set('area')}
+                    style={inputStyle}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                  >
+                    <option value="">Seleccionar área…</option>
+                    {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </Field>
+              )}
               <Field label="N° de OP">
                 <input
                   type="text"

@@ -553,6 +553,7 @@ export default function App() {
           project={modal.project}
           defaultArea={defaultAreaForNew}
           showGastoEstructura={showGastoEstructura}
+          user={user}
           onClose={() => setModal(null)}
           onSaved={() => { setModal(null); refresh(); }}
         />
