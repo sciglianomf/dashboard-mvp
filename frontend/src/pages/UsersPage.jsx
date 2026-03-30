@@ -29,23 +29,12 @@ const ROL_COLORS = {
 /* ─── Helper: llamar Edge Function ───────────────────────── */
 
 async function callAdminFn(action, payload) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token;
-  if (!token) throw new Error('Sin sesión activa');
-
-  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`;
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ action, payload }),
+  const { data, error } = await supabase.functions.invoke('admin-users', {
+    body: { action, payload },
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+  if (error) throw new Error(error.message || 'Error al contactar la función');
+  if (data?.error) throw new Error(data.error);
   return data;
 }
 
