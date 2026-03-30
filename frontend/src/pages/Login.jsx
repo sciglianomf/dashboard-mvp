@@ -103,7 +103,7 @@ export default function Login() {
 
           <div>
             <label style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--sans)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-              PIN (4 dígitos)
+              Contraseña
             </label>
             <input
               type="password"
