@@ -21,8 +21,8 @@ export default function Login() {
       setError('Solo se permiten emails @american-ads.com');
       return;
     }
-    if (!/^\d{4}$/.test(pin)) {
-      setError('El PIN debe ser exactamente 4 dígitos numéricos');
+    if (!pin) {
+      setError('Ingresá tu contraseña');
       return;
     }
 
@@ -108,9 +108,8 @@ export default function Login() {
             <input
               type="password"
               value={pin}
-              onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-              placeholder="••••"
-              maxLength={4}
+              onChange={e => setPin(e.target.value)}
+              placeholder="Contraseña"
               autoComplete="current-password"
               required
               style={{
@@ -120,8 +119,8 @@ export default function Login() {
                 borderRadius: '8px',
                 padding: '10px 14px',
                 color: 'var(--text-primary)',
-                fontSize: '20px',
-                letterSpacing: '0.4em',
+                fontSize: '13px',
+                letterSpacing: 'normal',
                 fontFamily: 'var(--sans)',
                 outline: 'none',
                 boxSizing: 'border-box',
