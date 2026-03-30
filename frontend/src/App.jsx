@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import KPICard from './components/KPICard';
 import ProjectsTable from './components/ProjectsTable';
-import { ClientesChart, CampañasChart } from './components/Charts';
+import { ClientesChart, CampañasChart, GananciaNetaChart } from './components/Charts';
 import ComparativoChart from './components/ComparativoChart';
 import ExportButtons from './components/ExportButtons';
 import ProjectModal from './components/ProjectModal';
@@ -390,6 +390,10 @@ export default function App() {
         {/* Charts */}
         {!loadingSum && summary && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Gráfico de ganancia neta por área — solo Finanzas/DEV en vista consolidada */}
+            {showGastoEstructura && !activeArea && (
+              <GananciaNetaChart data={summary.byArea} />
+            )}
             <ComparativoChart data={summary.comparativoAnual} />
             <div
               className="charts-pair-grid"

@@ -66,6 +66,26 @@ function buildSummary(projects) {
     byAño[key].count += 1;
   }
 
+  // ── Ganancia neta por área (para gráfico de Finanzas) ──────────────────
+  const AREA_LIST = ['Creatividad', 'Producción', 'Trade', 'Finanzas'];
+  const byArea = {};
+  for (const area of AREA_LIST) {
+    byArea[area] = { area, tarifa: 0, totalProd: 0, margenAbs: 0, gastoEstructura: 0, gananciaNeta: 0, count: 0 };
+  }
+  for (const p of valid) {
+    const key = p.area;
+    if (byArea[key]) {
+      byArea[key].tarifa       += Number(p.tarifa) || 0;
+      byArea[key].totalProd    += Number(p.total_prod) || 0;
+      byArea[key].margenAbs    += Number(p.margen_abs) || 0;
+      byArea[key].gastoEstructura += Number(p.gasto_estructura_valor) || 0;
+      byArea[key].count        += 1;
+    }
+  }
+  for (const key of AREA_LIST) {
+    byArea[key].gananciaNeta = byArea[key].margenAbs - byArea[key].gastoEstructura;
+  }
+
   const años = [...new Set(valid.map((p) => p.año).filter(Boolean))].sort((a, b) => a - b);
 
   const añoActual = años.length > 0 ? Math.max(...años) : new Date().getFullYear();
@@ -91,6 +111,7 @@ function buildSummary(projects) {
     byCliente: Object.values(byCliente).sort((a, b) => b.tarifa - a.tarifa),
     byCampaña: Object.values(byCampaña).sort((a, b) => b.tarifa - a.tarifa),
     byAño: Object.values(byAño).sort((a, b) => a.año - b.año),
+    byArea: Object.values(byArea),
     comparativoAnual: { añoActual, añoAnterior, actual, anterior },
   };
 }
