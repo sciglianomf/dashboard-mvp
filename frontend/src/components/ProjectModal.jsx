@@ -394,7 +394,6 @@ export default function ProjectModal({
         padding: '16px',
         background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)',
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         style={{
