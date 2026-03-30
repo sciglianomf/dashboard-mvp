@@ -33,7 +33,16 @@ async function callAdminFn(action, payload) {
     body: { action, payload },
   });
 
-  if (error) throw new Error(error.message || 'Error al contactar la función');
+  if (error) {
+    // Intentar extraer el mensaje real del body de la respuesta
+    let detail = error.message;
+    try {
+      const body = await error.context?.json?.();
+      detail = body?.error || body?.message || error.message;
+    } catch (_) { /* response no es JSON */ }
+    throw new Error(detail);
+  }
+
   if (data?.error) throw new Error(data.error);
   return data;
 }

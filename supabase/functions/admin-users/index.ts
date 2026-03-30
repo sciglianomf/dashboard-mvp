@@ -1,52 +1,54 @@
 // supabase/functions/admin-users/index.ts
-// Admin-only edge function for user management operations.
-// Requires the caller to be a DEV user — verified via JWT + profiles table.
-// Uses SUPABASE_SERVICE_ROLE_KEY (auto-injected by Supabase) for admin operations.
+// Admin-only edge function for user management.
+// Verifica que el caller sea DEV usando el admin client con service role.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req: Request) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    // --- 1. Verify caller via their JWT ---
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
+    // Admin client — único client necesario
+    const admin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // --- 1. Extraer y validar JWT del caller ---
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.replace('Bearer ', '').trim();
+
+    if (!token) {
       return json({ error: 'No authorization header' }, 401);
     }
 
-    const callerClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: userError } = await callerClient.auth.getUser();
+    // getUser(token) valida el JWT contra Supabase Auth
+    const { data: { user }, error: userError } = await admin.auth.getUser(token);
     if (userError || !user) {
-      return json({ error: 'Invalid session' }, 401);
+      return json({ error: `Invalid token: ${userError?.message ?? 'unknown'}` }, 401);
     }
 
-    const { data: profile } = await callerClient
+    // --- 2. Verificar que el caller sea DEV ---
+    const { data: profile, error: profileError } = await admin
       .from('profiles')
       .select('rol')
       .eq('id', user.id)
       .single();
 
-    if (profile?.rol !== 'DEV') {
-      return json({ error: 'Forbidden: DEV role required' }, 403);
+    if (profileError) {
+      return json({ error: `Profile lookup failed: ${profileError.message}` }, 500);
     }
 
-    // --- 2. Admin client with service role ---
-    const admin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    if (profile?.rol !== 'DEV') {
+      return json({ error: 'Forbidden: se requiere rol DEV' }, 403);
+    }
 
+    // --- 3. Leer body ---
     const body = await req.json();
     const { action, payload } = body;
 
@@ -55,7 +57,7 @@ Deno.serve(async (req: Request) => {
       const { email, password, nombre, rol, area_principal, areas_permitidas } = payload;
 
       if (!email || !password || !nombre || !rol) {
-        return json({ error: 'Faltan campos requeridos' }, 400);
+        return json({ error: 'Faltan campos requeridos: email, password, nombre, rol' }, 400);
       }
 
       const { data: authData, error: createError } = await admin.auth.admin.createUser({
@@ -68,7 +70,7 @@ Deno.serve(async (req: Request) => {
         return json({ error: createError.message }, 400);
       }
 
-      const { error: profileError } = await admin.from('profiles').upsert({
+      const { error: profileInsertError } = await admin.from('profiles').upsert({
         id: authData.user.id,
         email,
         nombre,
@@ -77,10 +79,9 @@ Deno.serve(async (req: Request) => {
         areas_permitidas: areas_permitidas || [],
       });
 
-      if (profileError) {
-        // Rollback: delete the auth user we just created
+      if (profileInsertError) {
         await admin.auth.admin.deleteUser(authData.user.id);
-        return json({ error: 'Error al crear perfil: ' + profileError.message }, 500);
+        return json({ error: 'Error al crear perfil: ' + profileInsertError.message }, 500);
       }
 
       return json({
@@ -100,13 +101,10 @@ Deno.serve(async (req: Request) => {
       const { userId } = payload;
       if (!userId) return json({ error: 'userId requerido' }, 400);
 
-      // Delete profile first (FK constraint)
       await admin.from('profiles').delete().eq('id', userId);
 
       const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
-      if (deleteError) {
-        return json({ error: deleteError.message }, 500);
-      }
+      if (deleteError) return json({ error: deleteError.message }, 500);
 
       return json({ ok: true });
     }
@@ -115,7 +113,7 @@ Deno.serve(async (req: Request) => {
     if (action === 'updatePassword') {
       const { userId, password } = payload;
       if (!userId || !password) return json({ error: 'userId y password requeridos' }, 400);
-      if (password.length < 4) return json({ error: 'La contraseña debe tener al menos 4 caracteres' }, 400);
+      if (password.length < 4) return json({ error: 'Mínimo 4 caracteres' }, 400);
 
       const { error: pwError } = await admin.auth.admin.updateUserById(userId, { password });
       if (pwError) return json({ error: pwError.message }, 500);
@@ -123,10 +121,10 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true });
     }
 
-    return json({ error: 'Acción desconocida' }, 400);
+    return json({ error: `Acción desconocida: ${action}` }, 400);
 
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Error interno';
+    const msg = err instanceof Error ? err.message : String(err);
     return json({ error: msg }, 500);
   }
 });
